@@ -13,7 +13,7 @@ export const Login: FC = memo(() => {
   return (
     <section className="text-gray-600 body-font">
       <div className="container px-5 py-24 mx-auto flex flex-wrap items-center">
-      <img src='src/components/data/scheduling_app_icon.png' alt="Icon" className="object-contain h-full w-full lg:w-1/2"/>
+        <img src='src/components/data/Image/scheduling_app_icon.png' alt="Icon" className="object-contain h-full w-full lg:w-1/2" />
         <div className="lg:w-2/6 md:w-1/2 bg-gray-100 rounded-lg p-8 flex flex-col md:ml-auto w-full mt-10 md:mt-0">
           <div className="relative mb-4">
             <label
