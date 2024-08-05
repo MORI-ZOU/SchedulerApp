@@ -3,7 +3,7 @@ import { ShiftSetting } from '../pages/ShiftSetting';
 
 export const homeRoutes = [
   {
-    path: '/home',
+    path: '/Home',
     children: <Home />,
   },
   { path: '/ShiftSetting', children: <ShiftSetting /> },
