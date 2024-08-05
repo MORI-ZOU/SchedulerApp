@@ -1,8 +1,14 @@
-import { FC } from 'react';
-import { Link } from 'react-router-dom';
+import { FC, useCallback } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Icon } from "@iconify/react"
 
+
 export const Header: FC = () => {
+  const navigation = useNavigate();
+  const OnClickLogout = useCallback(() =>
+    navigation('/')
+    , [])
+
   return (
     <header className="text-gray-600 body-font">
       <div className="container mx-auto flex flex-wrap p-5 flex-col md:flex-row items-center">
@@ -28,8 +34,8 @@ export const Header: FC = () => {
           <Link to="/SkillSetting" className="mr-5 flex items-center hover:text-gray-900"><Icon icon="mingcute:tool-fill" className='mr-2' />スキル種類設定</Link>
           <Link to="/OvertimeSetting" className="mr-5 flex items-center hover:text-gray-900"><Icon icon="clarity:clock-solid" className='mr-2' />残業種類設定</Link>
         </nav>
-        <button className="inline-flex items-center bg-gray-100 border-0 py-1 px-3 focus:outline-none hover:bg-gray-200 rounded text-base mt-4 md:mt-0">
-          Button
+        <button className="inline-flex items-center bg-gray-100 border-0 py-1 px-3 focus:outline-none hover:bg-gray-200 rounded text-base mt-4 md:mt-0" onClick={OnClickLogout}>
+          ログアウト
           <svg
             fill="none"
             stroke="currentColor"
