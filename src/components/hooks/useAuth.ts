@@ -14,10 +14,10 @@ export const useAuth = () => {
       setLoading(true);
 
       ////DB処理を後で記述
-toast.success("login success")
-      navigation("/Home")
+      toast.success("サーバーにログインしました")
+      navigation('/Home')
     }catch(e){
-     toast.error(  "ログインに失敗しました");
+     toast.error("ログインに失敗しました");
     }
     finally{
       setLoading(false)

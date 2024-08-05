@@ -10,7 +10,7 @@ export const Router: FC = memo(() => {
   return (
     <DatabaseProvider>
       <Routes>
-        <Route path="/" element={<Login />}>
+        <Route path="/" element={<Login />}/>
           {homeRoutes.map((route) => (
             <Route
               key={route.path}
@@ -18,7 +18,6 @@ export const Router: FC = memo(() => {
               element={<HeaderLayout>{route.children}</HeaderLayout>}
             ></Route>
           ))}
-        </Route>
 
         <Route path="*" element={<Page404 />} />
       </Routes>

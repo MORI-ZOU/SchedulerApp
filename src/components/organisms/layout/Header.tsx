@@ -1,4 +1,5 @@
 import { FC } from 'react';
+import { Link } from 'react-router-dom';
 
 export const Header: FC = () => {
   return (
@@ -20,11 +21,11 @@ export const Header: FC = () => {
           <span className="ml-3 text-xl">AIシフトスケジューラ</span>
         </a>
         <nav className="md:mr-auto md:ml-4 md:py-1 md:pl-4 md:border-l md:border-gray-400 flex flex-wrap items-center text-base justify-center">
-          <a className="mr-5 hover:text-gray-900" >シフト生成</a>
-          <a className="mr-5 hover:text-gray-900">作業者情報設定</a>
-          <a className="mr-5 hover:text-gray-900">シフト種類設定</a>
-          <a className="mr-5 hover:text-gray-900">スキル種類設定</a>
-          <a className="mr-5 hover:text-gray-900">残業種類設定</a>
+          <Link to="/" className="mr-5 hover:text-gray-900" >シフト生成</Link>
+          <Link to="/" className="mr-5 hover:text-gray-900">作業者情報設定</Link>
+          <Link to="/ShiftSetting" className="mr-5 hover:text-gray-900">シフト種類設定</Link>
+          <Link to="/SkillSetting" className="mr-5 hover:text-gray-900">スキル種類設定</Link>
+          <Link to="/OvertimeSetting" className="mr-5 hover:text-gray-900">残業種類設定</Link>
         </nav>
         <button className="inline-flex items-center bg-gray-100 border-0 py-1 px-3 focus:outline-none hover:bg-gray-200 rounded text-base mt-4 md:mt-0">
           Button
