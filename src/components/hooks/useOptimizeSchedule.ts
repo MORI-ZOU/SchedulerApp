@@ -1,21 +1,25 @@
 import { useCallback, useState } from 'react';
 import { toast } from 'react-toastify';
 import { Employee } from '../../types/Employee';
+import { OptimizedSchedule } from '../../types/OptimizedSchedule';
 import { DateOnly } from '../../types/DateOnly';
 
-const dataSource: Array<Employee> = [
+const dataSource: Array<OptimizedSchedule> = [
     {
-        employee_detail: {
-            id: "1",
-            name: "テスト太郎",
-            max_overtime_hours_per_day: 4,
-            max_overtime_hours_per_month: 80,
-            work_days_per_cycle: 5,
-            cycle_start_date: new DateOnly(2024, 9, 1),
-            enable_prohibited_shift_transitions: false,
+        date: new Date(2024, 9, 1),
+        employee: {
+            employee_detail: {
+                id: "3",
+                name: "テスト三郎",
+                max_overtime_hours_per_day: 4,
+                max_overtime_hours_per_month: 30,
+                work_days_per_cycle: 5,
+                cycle_start_date: new DateOnly(2024, 9, 3),
+                enable_prohibited_shift_transitions: false,
+            },
+            valid_shift: [{ employee_id: "3", shift_id: "SHIFT1" }],
+            valid_skill: [{ employee_id: "3", skill_id: "SKILL1", task_efficiency: 1.5 }]
         },
-        valid_shift: [{ employee_id: "1", shift_id: "日勤" }, { employee_id: "1", shift_id: "夜勤" }],
-        valid_skill: [{ employee_id: "1", skill_id: "SKILL1", task_efficiency: 1.0 }]
     },
     {
         employee_detail: {
@@ -45,7 +49,7 @@ const dataSource: Array<Employee> = [
     },
 ];
 
-export const useEmployees = () => {
+export const useOptimizeSchedule = () => {
     const [loading, setLoading] = useState<boolean>(false);
     const [Employees, setEmployees] = useState<Array<Employee>>([]);
 
@@ -56,9 +60,9 @@ export const useEmployees = () => {
             setEmployees(dataSource)
 
             ////DB処理を後で記述
-            toast.success("従業員データを取得しました")
+            toast.success("最適化したスケジュールデータを取得しました")
         } catch (e) {
-            toast.error("従業員データ取得に失敗しました");
+            toast.error("最適化したスケジュールデータ取得に失敗しました");
         }
         finally {
             setLoading(false)

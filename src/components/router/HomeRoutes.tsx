@@ -1,5 +1,6 @@
 import { EmployeeSetting } from '../pages/EmployeeSetting';
 import { Home } from '../pages/Home';
+import { OptimizedSchedule } from '../pages/OptimizedSchedule';
 import { OvertimeSetting } from '../pages/OvertimeSetting';
 import { ShiftSetting } from '../pages/ShiftSetting';
 import { SkillSetting } from '../pages/SkillSetting';
@@ -12,5 +13,6 @@ export const homeRoutes = [
   { path: '/ShiftSetting', children: <ShiftSetting /> },
   { path: '/SkillSetting', children: <SkillSetting /> },
   { path: '/OvertimeSetting', children: <OvertimeSetting /> },
-  { path: "/EmployeeSetting", children: <EmployeeSetting /> }
+  { path: "/EmployeeSetting", children: <EmployeeSetting /> },
+  { path: "/OptimizedSchedule", children: <OptimizedSchedule /> }
 ];
