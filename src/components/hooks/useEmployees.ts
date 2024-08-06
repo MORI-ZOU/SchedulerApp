@@ -44,11 +44,11 @@ const dataSource: Array<Employee> = [
     },
 ];
 
-export const useAllUsers = () => {
+export const useEmployees = () => {
     const [loading, setLoading] = useState<boolean>(false);
     const [Employees, setEmployees] = useState<Array<Employee>>([]);
 
-    const getUsers = useCallback(() => {
+    const getEmployees = useCallback(() => {
         try {
             setLoading(true);
 
@@ -64,5 +64,5 @@ export const useAllUsers = () => {
         }
     }, []);
 
-    return { getUsers, loading, Employees };
+    return { getUsers: getEmployees, loading, Employees };
 };

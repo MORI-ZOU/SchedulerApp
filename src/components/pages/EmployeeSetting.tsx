@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { Employee } from "../../types/Employee";
 import { EmployeeCard } from "../organisms/employee/EmployeeCard";
 import { EmployeeDetailModal } from "../organisms/employee/EmployeeDetailModal";
-import { useAllUsers } from "../hooks/useEmployees";
+import { useEmployees } from "../hooks/useEmployees";
+import { useSelectEmployee } from "../hooks/useSelectedEmployee";
 
 const dataSource: Array<Employee> = [
     {
@@ -47,10 +48,15 @@ const dataSource: Array<Employee> = [
 ];
 
 export const EmployeeSetting = () => {
-    const { getUsers, users, loading } = useAllUsers();
+    const { getUsers, Employees, loading } = useEmployees();
+    const { onSelectEmployee, selectedEmployee } = useSelectEmployee();
     const [isModalOpen, setModalOpen] = useState(false);
     const openModal = () => setModalOpen(true);
     const closeModal = () => setModalOpen(false);
+
+    const onClickUser = useCallback((id: string) => {
+        onSelectEmployee({ id: id, users: Employees, onOpen: openModal })
+    }, [Employees, onSelectEmployee, openModal])
 
     return (
         <>
@@ -60,15 +66,15 @@ export const EmployeeSetting = () => {
                         {dataSource.map((user) => (
                             <EmployeeCard
                                 key={user.employee_detail.id}
-                                employee_detail={user.employee_detail}
-                                valid_shift={user.valid_shift}
-                                valid_skill={user.valid_skill}
+                                employee={user}
+                                onClick={() => onClickUser(user.employee_detail.id)}
                             />
                         ))}
                     </div>
                 </div>
             </section>
-            <EmployeeDetailModal employee={ } />
+            <EmployeeDetailModal employee={selectedEmployee} isOpen={isModalOpen}
+                onRequestClose={closeModal} onSave={() => console.log("se-bu")} />
         </>
     );
 };
