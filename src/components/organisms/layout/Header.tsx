@@ -29,7 +29,7 @@ export const Header: FC = () => {
         </a>
         <nav className="md:mr-auto md:ml-4 md:py-1 md:pl-4 md:border-l md:border-gray-400 flex flex-wrap items-center text-base justify-center">
           <Link to="/" className="mr-5 flex items-center hover:text-gray-900" ><Icon icon="simple-icons:createreactapp" className='mr-2' />シフト生成</Link>
-          <Link to="/" className="mr-5 flex items-center hover:text-gray-900"><Icon icon="raphael:employee" className='mr-2' />作業者情報設定</Link>
+          <Link to="/EmployeeSetting" className="mr-5 flex items-center hover:text-gray-900"><Icon icon="raphael:employee" className='mr-2' />作業者情報設定</Link>
           <Link to="/ShiftSetting" className="mr-5 flex items-center hover:text-gray-900"><Icon icon="simple-line-icons:calender" className='mr-2' />シフト種類設定</Link>
           <Link to="/SkillSetting" className="mr-5 flex items-center hover:text-gray-900"><Icon icon="mingcute:tool-fill" className='mr-2' />スキル種類設定</Link>
           <Link to="/OvertimeSetting" className="mr-5 flex items-center hover:text-gray-900"><Icon icon="clarity:clock-solid" className='mr-2' />残業種類設定</Link>

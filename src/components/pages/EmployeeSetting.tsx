@@ -1,6 +1,8 @@
-import { useCallback, useState } from 'react';
-import { toast } from 'react-toastify';
-import { Employee } from '../../types/Employee';
+import { useState } from "react";
+import { Employee } from "../../types/Employee";
+import { EmployeeCard } from "../organisms/employee/EmployeeCard";
+import { EmployeeDetailModal } from "../organisms/employee/EmployeeDetailModal";
+import { useAllUsers } from "../hooks/useEmployees";
 
 const dataSource: Array<Employee> = [
     {
@@ -44,25 +46,32 @@ const dataSource: Array<Employee> = [
     },
 ];
 
-export const useAllUsers = () => {
-    const [loading, setLoading] = useState<boolean>(false);
-    const [Employees, setEmployees] = useState<Array<Employee>>([]);
+export const EmployeeSetting = () => {
+    const { getUsers, users, loading } = useAllUsers();
+    const [isModalOpen, setModalOpen] = useState(false);
+    const openModal = () => setModalOpen(true);
+    const closeModal = () => setModalOpen(false);
 
-    const getUsers = useCallback(() => {
-        try {
-            setLoading(true);
-
-            setEmployees(dataSource)
-
-            ////DB処理を後で記述
-            toast.success("データを取得しました")
-        } catch (e) {
-            toast.error("データ取得に失敗しました");
-        }
-        finally {
-            setLoading(false)
-        }
-    }, []);
-
-    return { getUsers, loading, Employees };
+    return (
+        <>
+            <section className="text-gray-600 body-font overflow-hidden">
+                <div className="container px-5 py-24 mx-auto">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" >
+                        {dataSource.map((user) => (
+                            <EmployeeCard
+                                key={user.employee_detail.id}
+                                employee_detail={user.employee_detail}
+                                valid_shift={user.valid_shift}
+                                valid_skill={user.valid_skill}
+                            />
+                        ))}
+                    </div>
+                </div>
+            </section>
+            <EmployeeDetailModal employee={ } />
+        </>
+    );
 };
+
+
+

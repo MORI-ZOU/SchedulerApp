@@ -1,44 +1,42 @@
-export const EmployeeCard = () => {
+import React, { FC } from 'react';
+import { Employee } from '../../../types/Employee';
+import { Icon } from "@iconify/react"
+
+export const EmployeeCard: FC<Employee> = (props) => {
+
 
     return (
-        <section className="text-gray-600 body-font overflow-hidden">
-            <div className="container px-5 py-24 mx-auto">
-                <div className="flex flex-wrap -m-4">
-                    <div className="p-4 xl:w-1/4 md:w-1/2 w-full">
-                        <div className="h-full p-6 rounded-lg border-2 border-gray-300 flex flex-col relative overflow-hidden">
-                            <h2 className="text-sm tracking-widest title-font mb-1 font-medium">START</h2>
-                            <h1 className="text-5xl text-gray-900 pb-4 mb-4 border-b border-gray-200 leading-none">Free</h1>
-                            <p className="flex items-center text-gray-600 mb-2">
-                                <span className="w-4 h-4 mr-2 inline-flex items-center justify-center bg-gray-400 text-white rounded-full flex-shrink-0">
-                                    <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" className="w-3 h-3" viewBox="0 0 24 24">
-                                        <path d="M20 6L9 17l-5-5"></path>
-                                    </svg>
-                                </span>Vexillologist pitchfork
-                            </p>
-                            <p className="flex items-center text-gray-600 mb-2">
-                                <span className="w-4 h-4 mr-2 inline-flex items-center justify-center bg-gray-400 text-white rounded-full flex-shrink-0">
-                                    <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" className="w-3 h-3" viewBox="0 0 24 24">
-                                        <path d="M20 6L9 17l-5-5"></path>
-                                    </svg>
-                                </span>Tumeric plaid portland
-                            </p>
-                            <p className="flex items-center text-gray-600 mb-6">
-                                <span className="w-4 h-4 mr-2 inline-flex items-center justify-center bg-gray-400 text-white rounded-full flex-shrink-0">
-                                    <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" className="w-3 h-3" viewBox="0 0 24 24">
-                                        <path d="M20 6L9 17l-5-5"></path>
-                                    </svg>
-                                </span>Mixtape chillwave tumeric
-                            </p>
-                            <button className="flex items-center mt-auto text-white bg-gray-400 border-0 py-2 px-4 w-full focus:outline-none hover:bg-gray-500 rounded">Button
-                                <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" className="w-4 h-4 ml-auto" viewBox="0 0 24 24">
-                                    <path d="M5 12h14M12 5l7 7-7 7"></path>
-                                </svg>
-                            </button>
-                            <p className="text-xs text-gray-500 mt-3">Literally you probably haven't heard of them jean shorts.</p>
-                        </div>
-                    </div>
+        <div className="w-[360px] h-[260px]] p-4 bg-slate-100">
+            <div className="h-full p-6 rounded-lg border-2 border-gray-300 flex flex-col">
+                <h2 className="text-sm tracking-widest title-font mb-1 font-medium">ID: {props.employee_detail.id}</h2>
+                <h1 className="text-2xl text-gray-900 pb-4 mb-4 border-b border-gray-200 leading-none">{props.employee_detail.name}</h1>
+                <p className="text-gray-600 mb-2">1日の最大残業時間: {props.employee_detail.max_overtime_hours_per_day} 時間</p>
+                <p className="text-gray-600 mb-2">1ヶ月の最大残業時間: {props.employee_detail.max_overtime_hours_per_month} 時間</p>
+                <p className="text-gray-600 mb-2">サイクル日数: {props.employee_detail.work_days_per_cycle}日</p>
+                <p className="text-gray-600 mb-2">サイクル開始日: {props.employee_detail.cycle_start_date.toDateString()}から</p>
+                <div className="text-gray-600 mb-2">
+                    <h3 className="font-medium">有効なシフト:</h3>
+                    <ul>
+                        {props.valid_shift.map((shift, index) => (
+                            <li key={index}>シフトID: {shift.shift_id}</li>
+                        ))}
+                    </ul>
                 </div>
+                <div className="text-gray-600 mb-2">
+                    <h3 className="font-medium">有効なスキル:</h3>
+                    <ul>
+                        {props.valid_skill.map((skill, index) => (
+                            <li key={index}>
+                                スキルID: {skill.skill_id}, 効率: {skill.task_efficiency}
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+                <button className="mt-auto text-white bg-gray-400 border-0 py-2 px-4 focus:outline-none hover:bg-gray-500 rounded flex items-center justify-center">
+                    <Icon icon="uiw:setting" className='mr-2' />設定</button>
+                <p className="text-xs text-gray-500 mt-3">Sample Card Component.</p>
+
             </div>
-        </section>
-    )
-}
+        </div>
+    );
+};
