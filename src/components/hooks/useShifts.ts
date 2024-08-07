@@ -40,5 +40,5 @@ export const useShifts = () => {
         }
     }, []);
 
-    return { getShifts, loading, shifts };
+    return { getShifts, setShifts, loading, shifts };
 };

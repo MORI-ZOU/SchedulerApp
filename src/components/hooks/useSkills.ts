@@ -22,13 +22,13 @@ const dataSource: Array<Skill> = [
 
 export const useSkills = () => {
     const [loading, setLoading] = useState<boolean>(false);
-    const [shifts, setShifts] = useState<Array<Skill>>([]);
+    const [skills, setSkills] = useState<Array<Skill>>([]);
 
     const getSkills = useCallback(() => {
         try {
             setLoading(true);
 
-            setShifts(dataSource)
+            setSkills(dataSource)
 
             ////DB処理を後で記述
             toast.success("スキル種類データを取得しました")
@@ -40,5 +40,5 @@ export const useSkills = () => {
         }
     }, []);
 
-    return { getSkills, loading, shifts };
+    return { getSkills, setSkills, loading, skills };
 };

@@ -1,7 +1,6 @@
-import { ChangeEvent, FC, memo, useEffect, useState } from "react"
+import { FC, useEffect, useState } from "react"
 import Modal from "react-modal";
 import { Employee } from "../../../types/Employee";
-import { toast } from "react-toastify";
 import { EmployeeDetail } from "../../../types/EmployeeDetail";
 import { valid_shift } from "../../../types/valid_shift";
 import { valid_skill } from "../../../types/valid_skill";
@@ -57,7 +56,7 @@ export const EmployeeDetailModal: FC<Props> = (props) => {
     const addValidShift = () => {
         setUpdatedEmployee(prevState => ({
             ...prevState,
-            valid_shift: [...prevState.valid_shift, { employee_id: '', shift_id: '' }],
+            valid_shift: [...prevState.valid_shift, { employee_id: employee.employee_detail.id, shift_id: '' }],
         }));
     };
 
@@ -79,7 +78,7 @@ export const EmployeeDetailModal: FC<Props> = (props) => {
     const addValidSkill = () => {
         setUpdatedEmployee(prevState => ({
             ...prevState,
-            valid_skill: [...prevState.valid_skill, { employee_id: '', skill_id: '', task_efficiency: 0 }],
+            valid_skill: [...prevState.valid_skill, { employee_id: employee.employee_detail.id, skill_id: '', task_efficiency: 0 }],
         }));
     };
 
@@ -90,11 +89,12 @@ export const EmployeeDetailModal: FC<Props> = (props) => {
         });
     };
 
-
     const handleSave = () => {
         onSave(updatedEmployee);
         onRequestClose();
     };
+
+    console.log(updatedEmployee)
 
     return (
         <Modal isOpen={isOpen} onRequestClose={onRequestClose} ariaHideApp={false}>
@@ -149,7 +149,7 @@ export const EmployeeDetailModal: FC<Props> = (props) => {
                     onChange={(e) => onChangeField("cycle_start_date", DateOnly.fromString(e.target.value))}
                     className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
                 />
-                <div className="mt-4">
+                <div className="mt-4 bg-teal-100 p-4 rounded">
                     <h3 className="font-bold">有効なシフト</h3>
                     {updatedEmployee.valid_shift.map((shift, index) => (
                         <div key={index} className="mb-4 border p-2 rounded">
@@ -160,19 +160,19 @@ export const EmployeeDetailModal: FC<Props> = (props) => {
                                 onChange={(e) => onChangeValidShift(index, 'shift_id', e.target.value)}
                                 className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
                             />
-                            <label className="block text-sm font-medium text-gray-700">社員ID</label>
+                            {/* <label className="block text-sm font-medium text-gray-700">社員ID</label>
                             <input
                                 type="text"
                                 value={shift.employee_id}
                                 onChange={(e) => onChangeValidShift(index, 'employee_id', e.target.value)}
                                 className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-                            />
+                            /> */}
                             <button onClick={() => removeValidShift(index)} className="mt-2 text-white bg-red-500 hover:bg-red-600 rounded px-2 py-1">削除</button>
                         </div>
                     ))}
                     <button onClick={addValidShift} className="mt-2 text-white bg-blue-500 hover:bg-blue-600 rounded px-2 py-1">シフトを追加</button>
                 </div>
-                <div className="mt-4">
+                <div className="mt-4 bg-teal-100 p-4 rounded">
                     <h3 className="font-bold">有効なスキル</h3>
                     {updatedEmployee.valid_skill.map((skill, index) => (
                         <div key={index} className="mb-4 border p-2 rounded">

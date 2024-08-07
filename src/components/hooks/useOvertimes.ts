@@ -41,5 +41,5 @@ export const useOvertimes = () => {
         }
     }, []);
 
-    return { getOvertimes, loading, overtimes };
+    return { getOvertimes, setOvertimes, loading, overtimes };
 };

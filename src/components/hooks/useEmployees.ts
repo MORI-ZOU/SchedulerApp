@@ -43,6 +43,19 @@ const dataSource: Array<Employee> = [
         valid_shift: [{ employee_id: "3", shift_id: "SHIFT1" }],
         valid_skill: [{ employee_id: "3", skill_id: "SKILL1", task_efficiency: 1.5 }]
     },
+    {
+        employee_detail: {
+            id: "4",
+            name: "テスト四郎",
+            max_overtime_hours_per_day: 4,
+            max_overtime_hours_per_month: 40,
+            work_days_per_cycle: 5,
+            cycle_start_date: new DateOnly(2024, 9, 4),
+            enable_prohibited_shift_transitions: false,
+        },
+        valid_shift: [{ employee_id: "4", shift_id: "SHIFT1" }],
+        valid_skill: [{ employee_id: "4", skill_id: "SKILL1", task_efficiency: 1.05 }]
+    },
 ];
 
 export const useEmployees = () => {
@@ -65,5 +78,5 @@ export const useEmployees = () => {
         }
     }, []);
 
-    return { getEmployees, loading, Employees };
+    return { getEmployees, setEmployees, loading, Employees };
 };
