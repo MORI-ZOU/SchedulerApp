@@ -5,9 +5,10 @@ import { toast } from "react-toastify";
 import { EmployeeDetail } from "../../../types/EmployeeDetail";
 import { valid_shift } from "../../../types/valid_shift";
 import { valid_skill } from "../../../types/valid_skill";
+import { DateOnly } from "../../../types/DateOnly";
 
 type Props = {
-    employee: Employee | null;
+    employee: Employee;
     isOpen: boolean;
     onRequestClose: () => void;
     onSave: (updatedEmployee: Employee) => void;
@@ -20,7 +21,7 @@ const defaultEmployee: Employee = {
         max_overtime_hours_per_day: 0,
         max_overtime_hours_per_month: 0,
         work_days_per_cycle: 0,
-        cycle_start_date: new Date(),
+        cycle_start_date: new DateOnly(2024, 9, 1),
         enable_prohibited_shift_transitions: true
     },
     valid_shift: [],
@@ -32,9 +33,6 @@ export const EmployeeDetailModal: FC<Props> = (props) => {
     const [updatedEmployee, setUpdatedEmployee] = useState<Employee>(defaultEmployee);
 
     useEffect(() => {
-        if (!employee) {
-            return;
-        }
         setUpdatedEmployee(employee);
     }, [employee]);
 
@@ -147,8 +145,8 @@ export const EmployeeDetailModal: FC<Props> = (props) => {
                 />
                 <label className="block text-sm font-medium text-gray-700">サイクル開始日</label>
                 <input
-                    value={updatedEmployee.employee_detail.cycle_start_date.toLocaleDateString()}
-                    onChange={(e) => onChangeField("cycle_start_date", new Date(e.target.value))}
+                    value={updatedEmployee.employee_detail.cycle_start_date.toString()}
+                    onChange={(e) => onChangeField("cycle_start_date", DateOnly.fromString(e.target.value))}
                     className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
                 />
                 <div className="mt-4">

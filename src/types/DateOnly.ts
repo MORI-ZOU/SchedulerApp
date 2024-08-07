@@ -5,7 +5,7 @@ export class DateOnly {
 
     constructor(year: number, month: number, day: number) {
         if (!DateOnly.isValidDate(year, month, day)) {
-            throw new Error('Invalid date');
+            throw new Error('無効な日付です');
         }
         this.year = year;
         this.month = month;
@@ -20,6 +20,15 @@ export class DateOnly {
             date.getMonth() === month - 1 &&
             date.getDate() === day
         );
+    }
+
+    // 文字列形式からDateOnlyオブジェクトを生成する静的メソッド
+    static fromString(dateString: string): DateOnly {
+        const [year, month, day] = dateString.split('-').map(Number);
+        if (!DateOnly.isValidDate(year, month, day)) {
+            throw new Error('無効な日付です');
+        }
+        return new DateOnly(year, month, day);
     }
 
     // 日付を文字列でフォーマットする関数 (YYYY-MM-DD)

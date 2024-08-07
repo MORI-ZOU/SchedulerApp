@@ -21,6 +21,19 @@ export class Time {
         );
     }
 
+    // 文字列形式からTimeオブジェクトを生成する静的メソッド
+    static fromString(timeString: string): Time {
+        const parts = timeString.split(':').map(Number);
+        if (parts.length < 2 || parts.length > 3) {
+            throw new Error('Invalid time string format');
+        }
+        const [hours, minutes, seconds = 0] = parts;
+        if (!Time.isValid(hours, minutes, seconds)) {
+            throw new Error('Invalid time');
+        }
+        return new Time(hours, minutes, seconds);
+    }
+
     // 時間を文字列でフォーマットする関数
     toString(): string {
         const pad = (num: number) => num.toString().padStart(2, '0');
