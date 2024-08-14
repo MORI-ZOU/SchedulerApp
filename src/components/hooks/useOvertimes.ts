@@ -1,21 +1,22 @@
 import { useCallback, useState } from 'react';
 import { toast } from 'react-toastify';
 import { Overtime } from '../../types/Overtime';
+import { HexColor } from '../../types/HexColor';
 
 const dataSource: Array<Overtime> = [
     {
         id: '1',
-        color: '#FF5733',
+        color: new HexColor('#FF5733'),
         overtime_hours: 1
     },
     {
         id: '2',
-        color: '#33FF57',
+        color: new HexColor('#33FF57'),
         overtime_hours: 2
     },
     {
         id: '3',
-        color: '#3357FF',
+        color: new HexColor('#3357FF'),
         overtime_hours: 4
     },
 ];

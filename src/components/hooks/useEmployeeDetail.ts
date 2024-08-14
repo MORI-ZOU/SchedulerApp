@@ -34,7 +34,7 @@ const dataSource: Array<EmployeeDetail> = [
     },
 ];
 
-export const useOptimizeSchedule = () => {
+export const useEmployeeDetails = () => {
     const [loading, setLoading] = useState<boolean>(false);
     const [employeeDetails, setEmployeeDetails] = useState<Array<EmployeeDetail>>([]);
 
@@ -54,5 +54,5 @@ export const useOptimizeSchedule = () => {
         }
     }, []);
 
-    return { getEmployees, loading, Employees: employeeDetails };
+    return { getEmployees, setEmployeeDetails, loading, Employees: employeeDetails };
 };

@@ -2,16 +2,25 @@ import React, { useCallback, useEffect, useState } from 'react';
 import ReactDataGrid from '@inovua/reactdatagrid-community';
 import '@inovua/reactdatagrid-community/index.css';
 import { useSkills } from '../hooks/useSkills';
-import { TypeEditInfo } from '@inovua/reactdatagrid-community/types';
+import { TypeColumn, TypeEditInfo } from '@inovua/reactdatagrid-community/types';
 import { toast } from 'react-toastify';
+import { HexColorEditor } from '../organisms/Editor/HexColorEditor';
+import { HexColor } from '../../types/HexColor';
 
 
 const gridStyle = { minHeight: 550 };
 
-const columns = [
+const columns: TypeColumn[] = [
   { name: 'id', header: 'ID', defaultFlex: 1, type: "string" },
   { name: 'name', header: '名前', defaultFlex: 1, type: "string" },
-  { name: 'color', header: '背景色', defaultFlex: 1, type: "string" },
+  {
+    name: 'color',
+    header: '背景色',
+    defaultFlex: 1,
+    type: "HexColor",
+    render: ({ value }: { value: HexColor }) => <div style={{ color: value.toString() }}>{value.toString()}</div>,
+    renderEditor: HexColorEditor
+  },
 ];
 
 export const SkillSetting: React.FC = () => {

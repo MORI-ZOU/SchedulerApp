@@ -69,4 +69,9 @@ export class DateOnly {
             .replace('MM', pad(this.month))
             .replace('DD', pad(this.day));
     }
+
+    // 等価性を確認するメソッド
+    equals(other: DateOnly): boolean {
+        return this.year === other.year && this.month === other.month && this.day === other.day;
+    }
 }

@@ -1,22 +1,23 @@
 import { useCallback, useState } from 'react';
 import { toast } from 'react-toastify';
 import { Skill } from '../../types/Skill';
+import { HexColor } from '../../types/HexColor';
 
 const dataSource: Array<Skill> = [
     {
         id: "a",
         name: "TaskA",
-        color: "#fff",
+        color: new HexColor("#ec1818"),
     },
     {
         id: "b",
         name: "TaskB",
-        color: "#fff",
+        color: new HexColor("#2adf4e"),
     },
     {
         id: "c",
         name: "TaskC",
-        color: "#fff",
+        color: new HexColor("#0a18e6"),
     },
 ];
 

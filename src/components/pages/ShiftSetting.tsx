@@ -6,51 +6,24 @@ import { Time } from '../../types/Time';
 import { ShiftType } from '../../types/ShiftType';
 import { TypeColumn, TypeEditInfo } from '@inovua/reactdatagrid-community/types';
 import { toast } from 'react-toastify';
+import { TimeEditor } from '../organisms/Editor/TimeEditor';
+import { TextEditor } from '../organisms/Editor/TextEditor';
+import { HexColor } from '../../types/HexColor';
+import { HexColorEditor } from '../organisms/Editor/HexColorEditor';
 
 const gridStyle = { minHeight: 550 };
-
-type EditorProps = {
-  value: any;
-  onChange?: (value: any) => void;
-  onComplete?: () => void;
-}
-
-// Editor for general text inputs
-const TextEditor: FC<EditorProps> = (props): ReactNode => {
-  const { value, onChange, onComplete } = props
-
-  return (
-    <input
-      type="text"
-      value={value}
-      onChange={(e: ChangeEvent<HTMLInputElement>) => onChange && onChange(e.target.value)}
-      onBlur={onComplete}
-      className="inovua-reactdatagrid-editor"
-    />
-  )
-};
-
-// Editor for time inputs
-const TimeEditor: FC<EditorProps> = (props): ReactNode => {
-  const { value, onChange, onComplete } = props
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newTime = Time.fromString(e.target.value);
-    onChange && onChange(newTime);
-  };
-  return (
-    <input
-      type="Time"
-      value={value.toString().substring(0, 5)}
-      onChange={handleInputChange}
-      onBlur={onComplete}
-      className="inovua-reactdatagrid-editor"
-    />)
-};
 
 const columns: TypeColumn[] = [
   { name: 'id', header: 'ID', defaultFlex: 1, editable: true, renderEditor: TextEditor, type: "string" },
   { name: 'name', header: '名前', defaultFlex: 1, editable: true, renderEditor: TextEditor, type: "string" },
-  { name: 'color', header: '背景色', defaultFlex: 1, editable: true, renderEditor: TextEditor, type: "string" },
+  {
+    name: 'color',
+    header: '背景色',
+    defaultFlex: 1,
+    type: "HexColor",
+    render: ({ value }: { value: HexColor }) => <div style={{ color: value.toString() }}>{value.toString()}</div>,
+    renderEditor: HexColorEditor,
+  },
   {
     name: 'startTime',
     header: '開始時間',
@@ -76,16 +49,6 @@ export const ShiftSetting: React.FC = () => {
 
   useEffect(() => getShifts(), [getShifts]);
   useEffect(() => setData(shifts), [shifts]);
-
-  // const handleCellEdit = useCallback((editInfo: TypeEditInfo) => {
-  //   const { value, rowIndex, columnId } = editInfo;
-
-  //   const updatedData = [...data];
-  //   data[rowIndex] = Object.assign({}, data[rowIndex], { [columnId]: value })
-
-  //   console.log(data)
-  //   setData(updatedData);
-  // }, [data]);
 
   const handleCellEdit = useCallback((editInfo: TypeEditInfo) => {
     const { value, columnId, rowIndex } = editInfo;

@@ -1,7 +1,8 @@
 import { EmployeeSetting } from '../pages/EmployeeSetting';
 import { Home } from '../pages/Home';
-import { OptimizedSchedule } from '../pages/OptimizedSchedule';
+import { OptimizedSchedulePage } from '../pages/OptimizedSchedulePage';
 import { OvertimeSetting } from '../pages/OvertimeSetting';
+import TestApp from '../pages/SampleDatagrid';
 import { ShiftSetting } from '../pages/ShiftSetting';
 import { SkillSetting } from '../pages/SkillSetting';
 
@@ -14,5 +15,5 @@ export const homeRoutes = [
   { path: '/SkillSetting', children: <SkillSetting /> },
   { path: '/OvertimeSetting', children: <OvertimeSetting /> },
   { path: "/EmployeeSetting", children: <EmployeeSetting /> },
-  { path: "/OptimizedSchedule", children: <OptimizedSchedule /> }
+  { path: "/OptimizedSchedule", children: <OptimizedSchedulePage /> }
 ];

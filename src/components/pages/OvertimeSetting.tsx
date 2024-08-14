@@ -1,16 +1,26 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { FC, ReactNode, useCallback, useEffect, useState } from 'react';
 import ReactDataGrid from '@inovua/reactdatagrid-community';
 import '@inovua/reactdatagrid-community/index.css';
 import { useOvertimes } from '../hooks/useOvertimes';
-import { TypeEditInfo } from '@inovua/reactdatagrid-community/types';
+import { TypeColumn, TypeEditInfo } from '@inovua/reactdatagrid-community/types';
 import { toast } from 'react-toastify';
+import { HexColor } from '../../types/HexColor';
+import { HexColorEditor } from '../organisms/Editor/HexColorEditor';
 
+// 正しいパスを指定してください
 
 const gridStyle = { minHeight: 550 };
 
-const columns = [
+const columns: TypeColumn[] = [
   { name: 'id', header: 'ID', defaultFlex: 1, type: "string" },
-  { name: 'color', header: '背景色', defaultFlex: 1, type: "string" },
+  {
+    name: 'color',
+    header: '背景色',
+    defaultFlex: 1,
+    type: "HexColor",
+    render: ({ value }: { value: HexColor }) => <div style={{ color: value.toString() }}>{value.toString()}</div>,
+    renderEditor: HexColorEditor
+  },
   { name: 'overtime_hours', header: '残業時間', defaultFlex: 1, type: "string" },
 ];
 
@@ -18,22 +28,19 @@ export const OvertimeSetting: React.FC = () => {
   const { getOvertimes, setOvertimes, loading, overtimes } = useOvertimes();
   const [data, setData] = useState(overtimes);
 
-  useEffect(() => getOvertimes(), []);
-  useEffect(() => setData(overtimes), [overtimes]);
+  useEffect(() => {
+    getOvertimes();
+  }, []);
+
+  useEffect(() => {
+    setData(overtimes);
+  }, [overtimes]);
 
   const handleCellEdit = useCallback((editInfo: TypeEditInfo) => {
     const { value, columnId, rowIndex } = editInfo;
-
     setData(prevData => {
-      // Debugging output
-      console.log("Before Update:", JSON.stringify(prevData, null, 2));
-
       const updatedData = [...prevData];
       updatedData[rowIndex] = { ...updatedData[rowIndex], [columnId]: value };
-
-      // Debugging output
-      console.log("After Update:", JSON.stringify(updatedData, null, 2));
-
       return updatedData;
     });
   }, []);
@@ -41,8 +48,6 @@ export const OvertimeSetting: React.FC = () => {
   const onClickSave = () => {
     setOvertimes(data)
     toast.success("スキルを更新しました")
-
-    console.log("Data saved:", data);
   };
 
   return (

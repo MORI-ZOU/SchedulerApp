@@ -2,19 +2,20 @@ import { useCallback, useState } from 'react';
 import { toast } from 'react-toastify';
 import { ShiftType } from '../../types/ShiftType';
 import { Time } from '../../types/Time';
+import { HexColor } from '../../types/HexColor';
 
 const dataSource: Array<ShiftType> = [
     {
         id: "a",
         name: "日勤",
-        color: "#fff",
+        color: new HexColor("#ea3e3e"),
         startTime: new Time(8, 0, 0),
         endTime: new Time(17, 0, 0),
     },
     {
         id: "b",
         name: "夜勤",
-        color: "#fff",
+        color: new HexColor("#18d115"),
         startTime: new Time(21, 0, 0),
         endTime: new Time(6, 0, 0),
     },
