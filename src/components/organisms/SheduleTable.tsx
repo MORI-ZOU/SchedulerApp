@@ -1,75 +1,87 @@
-// ShiftTable.tsx
-import React from 'react';
+import React, { useState } from 'react';
+import ReactDataGrid from '@inovua/reactdatagrid-community';
+import '@inovua/reactdatagrid-community/index.css';
 import { OptimizedSchedule } from '../../types/OptimizedSchedule';
-import { DateOnly } from '../../types/DateOnly';
 
-interface Props {
-    optimizedSchedules: OptimizedSchedule[];
+interface RowType {
+  employeeName: string;
+  schedules: { [key: string]: { shiftName: string; overtimeHours: number; isFixShift?: boolean } };
 }
 
-// 文字列表現を用いてDateOnlyをユニークにするための関数
-const getUniqueDates = (dates: DateOnly[]): DateOnly[] => {
-    // 日付の文字列表現のSetを作成
-    const uniqueDateStrings = new Set(dates.map(date => date.toString()));
-    // 日付の文字列表現からDateOnlyオブジェクトを生成
-    const uniqueDates = Array.from(uniqueDateStrings).map(dateStr => DateOnly.fromString(dateStr));
-    return uniqueDates;
+interface ScheduleTableProps {
+  schedules: OptimizedSchedule[];
+  onFixShift: (updates: { date: string; employeeName: string; isFixShift: boolean }[]) => void;
 }
 
-export const ScheduleTable: React.FC<Props> = ({ optimizedSchedules }) => {
-    // 日付のリストをユニークにする
-    // const dates = Array.from(new Set(optimizedSchedules.map(schedule => schedule.date))).sort();
-    const dates = getUniqueDates(optimizedSchedules.map((s) => s.date))
-    const employees = Array.from(new Set(optimizedSchedules.map(schedule => schedule.employee)));
-    console.log(dates)
-    console.log(employees)
+export const ScheduleTable: React.FC<ScheduleTableProps> = ({ schedules, onFixShift }) => {
+  const [cellSelection, setCellSelection] = useState<{ [key: string]: boolean }>({});
+  const [selectedCells, setSelectedCells] = useState<string[]>([]);
 
-    // シフトを従業員IDと日付でマッピング
-    const shiftMap = new Map<string, Map<string, OptimizedSchedule>>();
-    optimizedSchedules.forEach(schedule => {
-        const { employee, date } = schedule;
-        if (!shiftMap.has(employee.employee_detail.id)) {
-            shiftMap.set(employee.employee_detail.id, new Map());
-        }
-        shiftMap.get(employee.employee_detail.id)?.set(date.toString(), schedule);
+  const dates = Array.from(new Set(schedules.map(s => s.date.toString())));
+
+  const columns = [
+    { name: 'employeeName', header: 'Employee', defaultFlex: 1 },
+    ...dates.map(date => ({
+      name: date,
+      header: date,
+      defaultFlex: 1,
+      render: ({ data }: { data: RowType }) => {
+        const schedule = data.schedules[date];
+        return schedule ? `${schedule.shiftName} / ${schedule.overtimeHours} ${schedule.isFixShift ? "(Fixed)" : ""}` : '';
+      }
+    }))
+  ];
+
+  const rows: RowType[] = Array.from(new Set(schedules.map(s => s.employee.employee_detail.name))).map(employeeName => {
+    const employeeSchedules = schedules.filter(s => s.employee.employee_detail.name === employeeName);
+    const scheduleMap = employeeSchedules.reduce((acc, schedule) => {
+      acc[schedule.date.toString()] = {
+        shiftName: schedule.shift.name,
+        overtimeHours: schedule.overtime.overtime_hours,
+        isFixShift: schedule.isFixShift
+      };
+      return acc;
+    }, {} as { [key: string]: { shiftName: string; overtimeHours: number; isFixShift?: boolean } });
+
+    return {
+      employeeName,
+      schedules: scheduleMap
+    };
+  });
+
+  const handleFixShift = () => {
+    const updates = Object.keys(cellSelection).map(key => {
+      const [row, col] = key.split(',');
+      const date = col;
+      const employeeName = rows[parseInt(row)].employeeName;
+      return { date, employeeName, isFixShift: true };
     });
 
-    return (
-        <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                    <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Employee</th>
-                        {dates.map(date => (
-                            <th key={date.toString()} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                {date.toString()}
-                            </th>
-                        ))}
-                    </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                    {employees.map(employee => (
-                        <tr key={employee.employee_detail.id}>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{employee.employee_detail.name}</td>
-                            {dates.map(date => {
-                                const schedule = shiftMap.get(employee.employee_detail.id)?.get(date.toString());
-                                return (
-                                    <td key={date.toString()} className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        {schedule ? (
-                                            <>
-                                                <div style={{ color: schedule.shift.color.toString() }}>{schedule.shift.name}</div>
-                                                <div style={{ color: schedule.overtime.color.toString() }}>{schedule.overtimeHours} hours</div>
-                                            </>
-                                        ) : (
-                                            <div>No shift</div>
-                                        )}
-                                    </td>
-                                );
-                            })}
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-        </div>
-    );
+    console.log(updates)
+    onFixShift(updates);
+  };
+
+  const handleCellSelectionChange = (selection: { [key: string]: boolean }) => {
+    setCellSelection(selection);
+    setSelectedCells(Object.keys(selection).filter(key => selection[key]));
+  };
+
+  return (
+    <div>
+        <span style={{ margin: '10px' }}>
+        {selectedCells.length === 0
+          ? 'セル未選択'
+          : `選択されたセル: ${selectedCells.length}`}
+      </span>
+      <button onClick={handleFixShift} className="text-white bg-blue-500 hover:bg-blue-600 rounded px-4 py-2">シフト固定</button>
+      <ReactDataGrid
+        idProperty="employeeName"
+        columns={columns}
+        dataSource={rows}
+        style={{ minHeight: 500 }}
+        cellSelection={cellSelection}
+        onCellSelectionChange={handleCellSelectionChange}
+      />
+    </div>
+  );
 };
