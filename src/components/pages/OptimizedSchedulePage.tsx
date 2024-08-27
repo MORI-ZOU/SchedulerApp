@@ -4,6 +4,12 @@ import { OptimizedSchedule } from '../../types/OptimizedSchedule';
 import { ScheduleTable } from '../organisms/SheduleTable';
 import { toast } from 'react-toastify';
 
+type Props = {
+  date: string;
+  employeeName: string;
+  isFixShift: boolean;
+}
+
 export const OptimizedSchedulePage: React.FC = () => {
   const { getSchedules, schedules, loading } = useOptimizeSchedule();
   const [localSchedules, setLocalSchedules] = useState<OptimizedSchedule[]>([]);
@@ -18,7 +24,7 @@ export const OptimizedSchedulePage: React.FC = () => {
     }
   }, [schedules]);
 
-  const handleFixShift = (updates: { date: string; employeeName: string; isFixShift: boolean }[]) => {
+  const handleFixShift = (updates: Array<Props>) => {
     toast.success("選択されたセルのシフトを固定しました。")
 
     const updatedSchedules = localSchedules.map(schedule => {
