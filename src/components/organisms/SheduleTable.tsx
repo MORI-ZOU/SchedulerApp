@@ -88,8 +88,8 @@ export const ScheduleTable: React.FC<ScheduleTableProps> = ({ schedules, onFixSh
   return (
     <div>
 
-      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginBottom: '10px' }}>
-        <span style={{ margin: '10px' }}>
+      <div className='flex justify-end gap-1 mb-1'>
+        <span className='m-1'>
           {selectedCells.length === 0
             ? 'セル未選択'
             : `選択されたセル: ${selectedCells.length}`}

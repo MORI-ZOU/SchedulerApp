@@ -13,6 +13,14 @@ import { HexColorEditor } from '../organisms/Editor/HexColorEditor';
 
 const gridStyle = { minHeight: 550 };
 
+const defaultShift: ShiftType = {
+  id: "NewShift",
+  name: "新しいシフト",
+  startTime: new Time(0, 0, 0),
+  endTime: new Time(12, 0, 0),
+  color: new HexColor("0000ff")
+}
+
 const columns: TypeColumn[] = [
   { name: 'id', header: 'ID', defaultFlex: 1, editable: true, renderEditor: TextEditor, type: "string" },
   { name: 'name', header: '名前', defaultFlex: 1, editable: true, renderEditor: TextEditor, type: "string" },
@@ -67,6 +75,12 @@ export const ShiftSetting: React.FC = () => {
     });
   }, []);
 
+  const onClickAdd = () => {
+    const newData = data;
+    newData.push(defaultShift);
+    setShifts(newData);
+  }
+
   const onClickSave = () => {
     setShifts(data)
     toast.success("シフトを更新しました")
@@ -85,7 +99,13 @@ export const ShiftSetting: React.FC = () => {
         editable={true}
         onEditComplete={handleCellEdit}
       />
-      <div className="flex justify-end w-full px-12 py-4">
+      <div className="flex justify-end w-full px-4 py-4 gap-1">
+        <button
+          onClick={() => onClickAdd()}
+          className="text-white bg-green-500 hover:bg-green-600 rounded px-4 py-2"
+        >
+          シフト追加
+        </button>
         <button
           onClick={onClickSave}
           className="text-white bg-blue-500 hover:bg-blue-600 rounded px-4 py-2"

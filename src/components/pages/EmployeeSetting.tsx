@@ -42,7 +42,7 @@ export const EmployeeSetting = () => {
     const onDeleteEmployee = (id: string) => {
         const updatedEmployees = Employees.filter(emp => emp.employee_detail.id !== id);
         setEmployees(updatedEmployees);
-        toast.success(`従業員 ${id} が削除されました`);
+        toast.success(`従業員(id:${id})が削除されました`);
     };
 
     const onSaveClick = (updatedEmployee: Employee) => {

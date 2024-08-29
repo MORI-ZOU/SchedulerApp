@@ -3,6 +3,7 @@ import { toast } from 'react-toastify';
 import { ShiftType } from '../../types/ShiftType';
 import { Time } from '../../types/Time';
 import { HexColor } from '../../types/HexColor';
+import axios from 'axios';
 
 const dataSource: Array<ShiftType> = [
     {
@@ -28,6 +29,8 @@ export const useShifts = () => {
     const getShifts = useCallback(() => {
         try {
             setLoading(true);
+            const shifts = axios.get()
+
 
             setShifts(dataSource)
 

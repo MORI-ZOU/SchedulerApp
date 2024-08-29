@@ -5,6 +5,7 @@ import { PrimaryButton } from '../atoms/button/PrimaryButton';
 export const Login: FC = memo(() => {
   const [databaseID, setDatabaseID] = useState('');
   const { login, loading } = useAuth();
+
   const onClickLogin = () => login(databaseID);
 
   const onChangeDatabaseId = (e: ChangeEvent<HTMLInputElement>) =>
