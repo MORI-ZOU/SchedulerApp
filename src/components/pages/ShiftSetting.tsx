@@ -97,7 +97,18 @@ export const ShiftSetting: React.FC = () => {
 
   const onClickDelete = () => {
     const selectedIds = Object.keys(selectedRows).filter(id => selectedRows[id]);
-    deleteShifts(selectedIds)
+    const shift = shifts.filter((val) => val.id == selectedIds[0])
+
+    if (shift.length > 0) {
+      deleteShifts(selectedIds)
+    }
+    else {
+      setData((prev) => {
+        return prev.filter((val) => val.id != selectedIds[0])
+      })
+      toast.success(`シフト(id:${selectedIds[0]})を削除しました`);
+    }
+
     console.log("Deleted Shifts:", selectedIds);
   };
 

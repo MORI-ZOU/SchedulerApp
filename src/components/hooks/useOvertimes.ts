@@ -43,8 +43,8 @@ export const useOvertimes = () => {
 
             const values: Array<Overtime> = res.data.map((val: any) => ({
                 id: val.id,
+                overtime_hours: val.overtime_hours,
                 color: new HexColor(val.color),
-                overtime_hours: val.overtime_hours
             }));
 
             ////loading
@@ -57,5 +57,53 @@ export const useOvertimes = () => {
             .finally(() => setLoading(false))
     }, []);
 
-    return { getOvertimes, setOvertimes, loading, overtimes };
+    const saveOvertimes = useCallback((overtimes: Overtime[]) => {
+        const data = {
+            database_id: databaseInfo?.id,
+            overtimes: overtimes.map(overtime => ({
+                id: overtime.id,
+                overtime_hours: overtime.overtime_hours,
+                color: overtime.color.toString(),
+            }))
+        };
+
+        console.log(data)
+
+        DatabaseAPI.post("/set-overtimes/", data).then(res => {
+            setLoading(true);
+
+            if (res.status !== 200) {
+                throw new Error(res.statusText);
+            }
+
+            getOvertimes();
+            toast.success("残業種類をデータベースに保存しました");
+        })
+            .catch((e) => toast.error("残業種類の保存に失敗しました" + e))
+            .finally(() => setLoading(false));
+    }, []);
+
+    const deleteOvertimes = useCallback((overtime_ids: string[]) => {
+        const data = {
+            database_id: databaseInfo?.id,
+            overtime_ids: overtime_ids
+        };
+
+        console.log(data)
+
+        DatabaseAPI.post("/delete-overtimes/", data).then(res => {
+            setLoading(true);
+
+            if (res.status !== 200) {
+                throw new Error(res.statusText);
+            }
+
+            getOvertimes();
+            toast.success("残業種類をデータベースから削除しました");
+        })
+            .catch((e) => toast.error("残業種類の削除に失敗しました" + e))
+            .finally(() => setLoading(false));
+    }, []);
+
+    return { getOvertimes, saveOvertimes, deleteOvertimes, loading, overtimes };
 };

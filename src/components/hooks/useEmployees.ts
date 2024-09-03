@@ -2,7 +2,6 @@ import { useCallback, useState } from 'react';
 import { toast } from 'react-toastify';
 import { Employee } from '../../types/Employee';
 import { DateOnly } from '../../types/DateOnly';
-import { EmployeeDetail } from '../../types/EmployeeDetail';
 import DatabaseAPI from '../api/DatabaseAPI';
 import { useLogin } from './useLogin';
 
@@ -64,7 +63,7 @@ const dataSource: Array<Employee> = [
 
 export const useEmployees = () => {
     const [loading, setLoading] = useState<boolean>(false);
-    const [Employees, setEmployees] = useState<Array<Employee>>([]);
+    const [employees, setEmployees] = useState<Array<Employee>>([]);
     const { databaseInfo } = useLogin();
 
     const getEmployees = useCallback(() => {
@@ -86,7 +85,7 @@ export const useEmployees = () => {
                     max_overtime_hours_per_day: val.max_overtime_hours_per_day,
                     max_overtime_hours_per_month: val.max_overtime_hours_per_month,
                     work_days_per_cycle: val.work_days_per_cycle,
-                    cycle_start_date: val.cycle_start_date,
+                    cycle_start_date: DateOnly.fromString(val.cycle_start_date),
                     enable_prohibited_shift_transitions: val.enable_prohibited_shift_transitions
                 },
                 valid_shift: val.valid_shifts.map((shift: any) => ({
@@ -110,5 +109,66 @@ export const useEmployees = () => {
             .finally(() => setLoading(false))
     }, []);
 
-    return { getEmployees, setEmployees, loading, Employees };
+    const saveEmployees = useCallback((employees: Employee[]) => {
+        const data = {
+            database_id: databaseInfo?.id,
+            employees: employees.map(employee => ({
+                id: employee.employee_detail.id,
+                name: employee.employee_detail.name,
+                max_overtime_hours_per_day: employee.employee_detail.max_overtime_hours_per_day,
+                max_overtime_hours_per_month: employee.employee_detail.max_overtime_hours_per_month,
+                work_days_per_cycle: employee.employee_detail.work_days_per_cycle,
+                cycle_start_date: employee.employee_detail.cycle_start_date.toString(),
+                enable_prohibited_shift_transitions: employee.employee_detail.enable_prohibited_shift_transitions,
+                valid_shift: employee.valid_shift.map((shift: any) => ({
+                    employee_id: shift.employee_id,
+                    shift_id: shift.shift_id
+                })),
+                valid_skill: employee.valid_skill.map((skill: any) => ({
+                    employee_id: skill.employee_id,
+                    skill_id: skill.skill_id,
+                    task_efficiency: skill.task_efficiency
+                }))
+            }))
+        };
+
+        console.log(data)
+
+        DatabaseAPI.post("/set-employees/", data).then(res => {
+            setLoading(true);
+
+            if (res.status !== 200) {
+                throw new Error(res.statusText);
+            }
+
+            getEmployees();
+            toast.success("作業者情報をデータベースに保存しました");
+        })
+            .catch((e) => toast.error("作業者情報の保存に失敗しました" + e))
+            .finally(() => setLoading(false));
+    }, []);
+
+    const deleteEmployees = useCallback((employee_ids: string[]) => {
+        const data = {
+            database_id: databaseInfo?.id,
+            employee_ids: employee_ids
+        };
+
+        console.log(data)
+
+        DatabaseAPI.post("/delete-employees/", data).then(res => {
+            setLoading(true);
+
+            if (res.status !== 200) {
+                throw new Error(res.statusText);
+            }
+
+            getEmployees();
+            toast.success("作業者情報をデータベースから削除しました");
+        })
+            .catch((e) => toast.error("作業者情報の削除に失敗しました" + e))
+            .finally(() => setLoading(false));
+    }, []);
+
+    return { getEmployees, saveEmployees, deleteEmployees, loading, employees };
 };

@@ -13,8 +13,8 @@ import { Skill } from '../../types/Skill';
 const gridStyle = { minHeight: 550 };
 
 const defaultSkill: Skill = {
-  id: "NewShift",
-  name: "新しいシフト",
+  id: "NewSkill",
+  name: "新しいスキル",
   color: new HexColor("0000ff")
 }
 
@@ -76,8 +76,20 @@ export const SkillSetting: React.FC = () => {
 
   const onClickDelete = () => {
     const selectedIds = Object.keys(selectedRows).filter(id => selectedRows[id]);
-    deleteSkills(selectedIds)
-    console.log("Deleted Shifts:", selectedIds);
+    const delteSkill = skills.filter((val) => val.id == selectedIds[0])
+
+    if (delteSkill.length > 0) {
+      ////DBにIDがあれば削除
+      deleteSkills(selectedIds)
+    }
+    else {
+      ////DBにIDが無ければローカル情報を削除
+      setData((prev) => {
+        const updateValue = prev.filter((val) => val.id != selectedIds[0])
+        return updateValue;
+      })
+      toast.success(`スキル(id:${selectedIds[0]})を削除しました`)
+    }
   }
 
   const handleSelectionChange = useCallback((arg: TypeOnSelectionChangeArg) => {

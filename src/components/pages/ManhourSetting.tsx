@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useManhours } from "../hooks/useManhours";
 import { Manhour } from "../../types/Manhour";
 import ReactDataGrid from "@inovua/reactdatagrid-community";
+import { MyDatepicker } from "../atoms/datepicker/MyDatePicker";
 
 interface RowType {
     condition: string;
@@ -75,6 +76,7 @@ export const ManhourSetting = () => {
     return (
         <div>
             <div className='px-20 py-2'>
+                <MyDatepicker />
                 <span className='m-1'>
                     {selectedCells.length === 0
                         ? 'セル未選択'
