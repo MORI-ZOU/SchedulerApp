@@ -4,6 +4,8 @@ import { ShiftType } from '../../types/ShiftType';
 import { Time } from '../../types/Time';
 import { HexColor } from '../../types/HexColor';
 import axios from 'axios';
+import DatabaseAPI from '../api/DatabaseAPI';
+import { useLogin } from './useLogin';
 
 const dataSource: Array<ShiftType> = [
     {
@@ -25,24 +27,86 @@ const dataSource: Array<ShiftType> = [
 export const useShifts = () => {
     const [loading, setLoading] = useState<boolean>(false);
     const [shifts, setShifts] = useState<Array<ShiftType>>([]);
+    const { databaseInfo } = useLogin();
 
     const getShifts = useCallback(() => {
-        try {
+        ////データ取得
+        DatabaseAPI.post("/get-shifts/", { database_id: databaseInfo?.id }).then((res) => {
             setLoading(true);
-            const shifts = axios.get()
 
+            if (res.status != 200) {
+                throw new Error(res.statusText)
+            }
 
-            setShifts(dataSource)
+            console.log("getShift", res)
+
+            const values: Array<ShiftType> = res.data.map((val: any) => ({
+                id: val.id,
+                name: val.name,
+                color: new HexColor(val.color),
+                startTime: Time.fromString(val.start_time),
+                endTime: Time.fromString(val.end_time)
+            }));
+
+            ////loading
+            setShifts(values)
 
             ////DB処理を後で記述
             toast.success("シフト種類データを取得しました")
-        } catch (e) {
-            toast.error("シフト種類データ取得に失敗しました");
-        }
-        finally {
-            setLoading(false)
-        }
+        })
+            .catch(() => toast.error("シフト種類データ取得に失敗しました"))
+            .finally(() => setLoading(false))
     }, []);
 
-    return { getShifts, setShifts, loading, shifts };
+    const saveShifts = useCallback((shifts: ShiftType[]) => {
+        const data = {
+            database_id: databaseInfo?.id,
+            shifts: shifts.map(shift => ({
+                id: shift.id,
+                name: shift.name,
+                color: shift.color.toString(),
+                start_time: shift.startTime.toString(),
+                end_time: shift.endTime.toString(),
+            }))
+        };
+
+        console.log(data)
+
+        DatabaseAPI.post("/set-shifts/", data).then(res => {
+            setLoading(true);
+
+            if (res.status !== 200) {
+                throw new Error(res.statusText);
+            }
+
+            getShifts();
+            toast.success("シフトをデータベースに保存しました");
+        })
+            .catch((e) => toast.error("シフトの保存に失敗しました" + e))
+            .finally(() => setLoading(false));
+    }, []);
+
+    const deleteShifts = useCallback((shift_ids: string[]) => {
+        const data = {
+            database_id: databaseInfo?.id,
+            shift_ids: shift_ids
+        };
+
+        console.log(data)
+
+        DatabaseAPI.post("/delete-shifts/", data).then(res => {
+            setLoading(true);
+
+            if (res.status !== 200) {
+                throw new Error(res.statusText);
+            }
+
+            getShifts();
+            toast.success("シフトをデータベースから削除しました");
+        })
+            .catch((e) => toast.error("シフトの削除に失敗しました" + e))
+            .finally(() => setLoading(false));
+    }, []);
+
+    return { getShifts, saveShifts, deleteShifts, loading, shifts };
 };

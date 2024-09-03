@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import ReactDataGrid from '@inovua/reactdatagrid-community';
 import '@inovua/reactdatagrid-community/index.css';
 import { OptimizedSchedule } from '../../types/OptimizedSchedule';
@@ -24,7 +24,7 @@ export const ScheduleTable: React.FC<ScheduleTableProps> = ({ schedules, onFixSh
     ...dates.map(date => ({
       name: date,
       header: date,
-      defaultFlex: 1,
+      defaultFlex: 2,
       render: ({ data }: { data: RowType }) => {
         const schedule = data.schedules[date];
         return schedule ? `${schedule.shiftName} / ${schedule.overtimeHours} ${schedule.isFixShift ? "(Fixed Shift)" : ""} ${schedule.isFixOvertime ? "(Fixed OT)" : ""}` : '';
@@ -78,16 +78,15 @@ export const ScheduleTable: React.FC<ScheduleTableProps> = ({ schedules, onFixSh
     }
   };
 
-  const handleCellSelectionChange = (selection: { [key: string]: boolean }) => {
+  const handleCellSelectionChange = useCallback((selection: { [key: string]: boolean }) => {
 
     console.log('newSelection:', selection);
     setCellSelection(selection);
     setSelectedCells(Object.keys(selection).filter(key => selection[key]));
-  };
+  }, []);
 
   return (
     <div>
-
       <div className='flex justify-end gap-1 mb-1'>
         <span className='m-1'>
           {selectedCells.length === 0
@@ -101,10 +100,11 @@ export const ScheduleTable: React.FC<ScheduleTableProps> = ({ schedules, onFixSh
       <ReactDataGrid
         idProperty="employeeName"
         columns={columns}
+        style={{ minHeight: 800 }}
         dataSource={rows}
-        style={{ minHeight: 500 }}
         cellSelection={cellSelection}
         onCellSelectionChange={handleCellSelectionChange}
+        columnMinWidth={130}
       />
     </div>
   );

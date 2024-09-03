@@ -98,7 +98,7 @@ export const EmployeeDetailModal: FC<Props> = (props) => {
 
     return (
         <Modal isOpen={isOpen} onRequestClose={onRequestClose} ariaHideApp={false}>
-            <div className="relative p-4">
+            <div className="relative p-4 container">
                 <button
                     onClick={onRequestClose}
                     className="absolute top-4 right-4 text-gray-600 hover:text-gray-900 focus:outline-none"

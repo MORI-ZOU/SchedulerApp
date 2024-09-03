@@ -43,7 +43,7 @@ export const OptimizedSchedulePage: React.FC = () => {
   if (loading) return <div>Loading...</div>;
 
   return (
-    <div style={{ paddingLeft: '50px', paddingRight: '50px' }}>
+    <div className='px-20 py-2'>
       <ScheduleTable schedules={localSchedules} onFixShift={handleFixShift} />
     </div>
   );

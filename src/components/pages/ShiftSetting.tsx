@@ -10,6 +10,7 @@ import { TimeEditor } from '../organisms/Editor/TimeEditor';
 import { TextEditor } from '../organisms/Editor/TextEditor';
 import { HexColor } from '../../types/HexColor';
 import { HexColorEditor } from '../organisms/Editor/HexColorEditor';
+import { TypeOnSelectionChangeArg } from '@inovua/reactdatagrid-community/types/TypeDataGridProps';
 
 const gridStyle = { minHeight: 550 };
 
@@ -52,8 +53,9 @@ const columns: TypeColumn[] = [
 
 
 export const ShiftSetting: React.FC = () => {
-  const { getShifts, setShifts, loading, shifts } = useShifts();
+  const { getShifts, saveShifts, deleteShifts, loading, shifts } = useShifts();
   const [data, setData] = useState<ShiftType[]>(shifts);
+  const [selectedRows, setSelectedRows] = useState<Record<string, boolean>>({});
 
   useEffect(() => getShifts(), [getShifts]);
   useEffect(() => setData(shifts), [shifts]);
@@ -76,20 +78,37 @@ export const ShiftSetting: React.FC = () => {
   }, []);
 
   const onClickAdd = () => {
-    const newData = data;
-    newData.push(defaultShift);
-    setShifts(newData);
+    setData((prev) => {
+      const newData = [...prev];
+      newData.push(defaultShift);
+      console.log("addShift", newData)
+
+      return newData;
+    });
+
+    toast.success("シフトを追加しました。内容を編集して「保存」ボタンで保存してください。")
+    console.log("data", data)
   }
 
   const onClickSave = () => {
-    setShifts(data)
-    toast.success("シフトを更新しました")
-
+    saveShifts(data)
     console.log("Data saved:", data);
   };
 
+  const onClickDelete = () => {
+    const selectedIds = Object.keys(selectedRows).filter(id => selectedRows[id]);
+    deleteShifts(selectedIds)
+    console.log("Deleted Shifts:", selectedIds);
+  };
+
+  const handleSelectionChange = useCallback((arg: TypeOnSelectionChangeArg) => {
+    const selected: Record<string, boolean> = arg.selected as Record<string, boolean>;
+    console.log("selected", selected)
+    setSelectedRows(selected || {});
+  }, []);
+
   return (
-    <div style={{ paddingLeft: '50px', paddingRight: '50px' }}>
+    <div className='px-10'>
       <ReactDataGrid
         idProperty="id"
         columns={columns}
@@ -98,13 +117,21 @@ export const ShiftSetting: React.FC = () => {
         loading={loading}
         editable={true}
         onEditComplete={handleCellEdit}
+        selected={selectedRows}
+        onSelectionChange={handleSelectionChange}
       />
       <div className="flex justify-end w-full px-4 py-4 gap-1">
         <button
           onClick={() => onClickAdd()}
           className="text-white bg-green-500 hover:bg-green-600 rounded px-4 py-2"
         >
-          シフト追加
+          追加
+        </button>
+        <button
+          onClick={onClickDelete}
+          className="text-white bg-red-500 hover:bg-red-600 rounded px-4 py-2"
+        >
+          選択項目を削除
         </button>
         <button
           onClick={onClickSave}

@@ -8,6 +8,8 @@ import { ShiftType } from '../../types/ShiftType';
 import { Skill } from '../../types/Skill';
 import { HexColor } from '../../types/HexColor';
 import { Overtime } from '../../types/Overtime';
+import { useLogin } from './useLogin';
+import DatabaseAPI from '../api/DatabaseAPI';
 
 const emps: Array<Employee> = [
     {
@@ -218,21 +220,75 @@ const dataSource: Array<OptimizedSchedule> = [
 export const useOptimizeSchedule = () => {
     const [loading, setLoading] = useState<boolean>(false);
     const [schedules, setSchedules] = useState<Array<OptimizedSchedule>>([]);
+    const { databaseInfo } = useLogin();
 
     const getSchedules = useCallback(() => {
-        try {
-            setLoading(true);
+        setLoading(true);
 
-            setSchedules(dataSource)
+        ////データ取得
+        DatabaseAPI.post("/get-optimized-schedule/", { database_id: databaseInfo?.id }).then((res) => {
+
+            if (res.status != 200) {
+                throw new Error(res.statusText)
+            }
+
+            console.log("res", res)
+
+            const values: Array<OptimizedSchedule> = res.data.map((val: any) => ({
+                date: val.date,
+                employee: {
+                    employee_detail: {
+                        id: val.employee.id,
+                        name: val.employee.name,
+                        max_overtime_hours_per_day: val.employee.max_overtime_hours_per_day,
+                        max_overtime_hours_per_month: val.employee.max_overtime_hours_per_month,
+                        work_days_per_cycle: val.employee.work_days_per_cycle,
+                        cycle_start_date: val.employee.cycle_start_date,
+                        enable_prohibited_shift_transitions: val.employee.enable_prohibited_shift_transitions
+                    },
+                    valid_shift: val.employee.valid_shifts.map((shift: any) => ({
+                        employee_id: shift.employee_id,
+                        shift_id: shift.shift_id
+                    })),
+                    valid_skill: val.employee.valid_skills.map((skill: any) => ({
+                        employee_id: skill.employee_id,
+                        skill_id: skill.skill_id,
+                        task_efficiency: skill.task_efficiency
+                    }))
+                },
+                skill: {
+                    id: val.skill.id,
+                    name: val.skill.name,
+                    color: new HexColor(val.skill.color)
+                },
+                shift: {
+                    id: val.shift.id,
+                    name: val.shift.name,
+                    color: new HexColor(val.shift.color),
+                    startTime: Time.fromString(val.shift.start_time),
+                    endTime: Time.fromString(val.shift.end_time)
+                },
+                overtime: {
+                    id: val.overtime.id,
+                    color: new HexColor(val.overtime.color),
+                    overtime_hours: val.overtime.overtime_hours
+                },
+                default_worktime_hours: val.default_worktime_hours,
+                overtime_hours: val.overtime_hours,
+                total_worktime_hours: val.total_worktime_hours,
+                is_fixed_shift: val.is_fixed_shift,
+                is_fixed_overtime: val.is_fixed_overtime
+            }));
+
+
+            ////loading
+            setSchedules(values)
 
             ////DB処理を後で記述
-            toast.success("最適化したスケジュールデータを取得しました")
-        } catch (e) {
-            toast.error("最適化したスケジュールデータ取得に失敗しました");
-        }
-        finally {
-            setLoading(false)
-        }
+            toast.success("残業種類データを取得しました")
+        })
+            .catch(() => toast.error("残業種類データ取得に失敗しました"))
+            .finally(() => setLoading(false))
     }, []);
 
     return { getSchedules, loading, schedules };

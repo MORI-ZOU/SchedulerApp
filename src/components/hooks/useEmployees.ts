@@ -2,6 +2,10 @@ import { useCallback, useState } from 'react';
 import { toast } from 'react-toastify';
 import { Employee } from '../../types/Employee';
 import { DateOnly } from '../../types/DateOnly';
+import { EmployeeDetail } from '../../types/EmployeeDetail';
+import DatabaseAPI from '../api/DatabaseAPI';
+import { useLogin } from './useLogin';
+
 
 const dataSource: Array<Employee> = [
     {
@@ -61,21 +65,49 @@ const dataSource: Array<Employee> = [
 export const useEmployees = () => {
     const [loading, setLoading] = useState<boolean>(false);
     const [Employees, setEmployees] = useState<Array<Employee>>([]);
+    const { databaseInfo } = useLogin();
 
     const getEmployees = useCallback(() => {
-        try {
-            setLoading(true);
+        setLoading(true);
 
-            setEmployees(dataSource)
+        ////データ取得
+        DatabaseAPI.post("/get-employees/", { database_id: databaseInfo?.id }).then((res) => {
+
+            if (res.status != 200) {
+                throw new Error(res.statusText)
+            }
+
+            console.log("res", res)
+
+            const values: Array<Employee> = res.data.map((val: any) => ({
+                employee_detail: {
+                    id: val.id,
+                    name: val.name,
+                    max_overtime_hours_per_day: val.max_overtime_hours_per_day,
+                    max_overtime_hours_per_month: val.max_overtime_hours_per_month,
+                    work_days_per_cycle: val.work_days_per_cycle,
+                    cycle_start_date: val.cycle_start_date,
+                    enable_prohibited_shift_transitions: val.enable_prohibited_shift_transitions
+                },
+                valid_shift: val.valid_shifts.map((shift: any) => ({
+                    employee_id: shift.employee_id,
+                    shift_id: shift.shift_id
+                })),
+                valid_skill: val.valid_skills.map((skill: any) => ({
+                    employee_id: skill.employee_id,
+                    skill_id: skill.skill_id,
+                    task_efficiency: skill.task_efficiency
+                }))
+            }));
+
+            ////loading
+            setEmployees(values)
 
             ////DB処理を後で記述
-            toast.success("従業員データを取得しました")
-        } catch (e) {
-            toast.error("従業員データ取得に失敗しました");
-        }
-        finally {
-            setLoading(false)
-        }
+            toast.success("作業者情報を取得しました")
+        })
+            .catch(() => toast.error("作業者情報の取得に失敗しました"))
+            .finally(() => setLoading(false))
     }, []);
 
     return { getEmployees, setEmployees, loading, Employees };
