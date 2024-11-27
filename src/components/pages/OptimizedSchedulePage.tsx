@@ -11,7 +11,7 @@ type Props = {
 }
 
 export const OptimizedSchedulePage: React.FC = () => {
-  const { getSchedules, schedules, loading } = useOptimizeSchedule();
+  const { getSchedules, Optimize, schedules, loading } = useOptimizeSchedule();
   const [localSchedules, setLocalSchedules] = useState<OptimizedSchedule[]>([]);
 
   useEffect(() => {
@@ -40,11 +40,24 @@ export const OptimizedSchedulePage: React.FC = () => {
 
   };
 
+  const onClickOptimize = () => {
+    Optimize();
+  }
+
   if (loading) return <div>Loading...</div>;
 
   return (
     <div className='px-20 py-2'>
       <ScheduleTable schedules={localSchedules} onFixShift={handleFixShift} />
+      <div className="flex justify-end w-full px-4 py-4 gap-1">
+        <button
+          onClick={onClickOptimize}
+          className="text-white bg-blue-500 hover:bg-blue-600 rounded px-4 py-2"
+        >
+          シフト生成
+        </button>
+      </div>
     </div>
+
   );
 };

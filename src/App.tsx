@@ -3,7 +3,9 @@ import './App.css';
 import { Router } from './components/router/Router';
 import { Bounce, ToastContainer } from "react-toastify"
 import 'react-toastify/dist/ReactToastify.css';
-import { DatabaseProvider } from './components/providers/DatabaseProvider';
+import 'flowbite';
+import 'flowbite/dist/flowbite.min.js';
+import { DateRangePicker } from 'flowbite-datepicker';
 
 function App() {
   return (

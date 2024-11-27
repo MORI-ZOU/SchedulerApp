@@ -51,7 +51,44 @@ export const useManhours = () => {
             .finally(() => setLoading(false))
     }, []);
 
-    return { getManhours, loading, manhours };
+    const saveManhours = useCallback((manhours: Manhour[]) => {
+        const data = {
+            database_id: databaseInfo?.id,
+            manhours: manhours.map(manhour => ({
+                date: manhour.date.toString(),
+                skill: {
+                    id: manhour.skill.id,
+                    name: manhour.skill.name,
+                    color: manhour.skill.color.toString()
+                },
+                shift: {
+                    id: manhour.shift.id,
+                    name: manhour.shift.name,
+                    color: manhour.shift.color.toString(),
+                    start_time: manhour.shift.startTime.toString(),
+                    end_time: manhour.shift.endTime.toString()
+                },
+                required_hours: manhour.required_hours
+            }))
+        };
+
+        console.log(data)
+
+        DatabaseAPI.post("/set-manhours/", data).then(res => {
+            setLoading(true);
+
+            if (res.status !== 200) {
+                throw new Error(res.statusText);
+            }
+
+            getManhours();
+            toast.success("必要工数をデータベースに保存しました");
+        })
+            .catch((e) => toast.error("必要工数の保存に失敗しました" + e))
+            .finally(() => setLoading(false));
+    }, []);
+
+    return { getManhours, saveManhours, loading, manhours };
 
 
 }

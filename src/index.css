@@ -1,4 +1,76 @@
-@import 'flowbite/dist/flowbite.css';
+/* @import 'flowbite-react'; */
+@import 'flowbite';
+@import 'flowbite/dist/flowbite.min.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.tabulator {
+    @apply font-sans border-gray-200;
+}
+
+.tabulator .tabulator-header {
+    @apply bg-gray-50 border-gray-200;
+}
+
+.tabulator .tabulator-header .tabulator-col {
+    @apply bg-gray-50 border-gray-200;
+}
+
+.tabulator .tabulator-header .tabulator-col-content {
+    @apply px-6 py-3;
+}
+
+.tabulator .tabulator-header .tabulator-col-title {
+    @apply text-xs font-medium text-gray-500 uppercase tracking-wider;
+}
+
+.tabulator .tabulator-row {
+    @apply border-gray-200;
+}
+
+.tabulator .tabulator-row.tabulator-selected {
+    @apply bg-blue-50;
+}
+
+.tabulator .tabulator-row .tabulator-cell {
+    @apply px-6 py-4 text-gray-900;
+}
+
+.tabulator .tabulator-row:hover {
+    @apply bg-gray-50;
+}
+
+.tabulator .tabulator-footer {
+    @apply bg-gray-50 border-gray-200;
+}
+
+.tabulator .tabulator-paginator {
+    @apply text-sm text-gray-700;
+}
+
+.tabulator .tabulator-page {
+    @apply px-3 py-1 mx-1 rounded border border-gray-300 bg-white text-gray-700 hover:bg-gray-50;
+}
+
+.tabulator .tabulator-page.active {
+    @apply bg-blue-500 text-white border-blue-500 hover:bg-blue-600;
+}
+
+.tabulator input[type="color"] {
+    @apply w-10 h-10 p-1 rounded-md cursor-pointer;
+}
+
+.tabulator input[type="time"] {
+    @apply px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500;
+}
+
+/* セル選択時のスタイル */
+.tabulator-row .tabulator-cell.tabulator-editing {
+    @apply border-2 border-blue-500;
+}
+
+/* 範囲選択時のスタイル */
+.tabulator-row .tabulator-cell.tabulator-range-selected {
+    @apply bg-blue-100;
+}

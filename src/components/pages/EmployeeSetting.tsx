@@ -44,6 +44,7 @@ export const EmployeeSetting = () => {
     const onClickDelete = (id: string) => {
         const deleteEmp = employees.filter((val) => val.employee_detail.id == id)
 
+        console.log("delteEmployee", deleteEmp);
         if (deleteEmp.length > 0) {
             ////DBにIDがあれば削除
             deleteEmployees([id])

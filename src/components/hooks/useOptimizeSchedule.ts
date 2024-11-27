@@ -285,11 +285,51 @@ export const useOptimizeSchedule = () => {
             setSchedules(values)
 
             ////DB処理を後で記述
-            toast.success("残業種類データを取得しました")
+            toast.success("シフトデータを取得しました")
         })
-            .catch(() => toast.error("残業種類データ取得に失敗しました"))
+            .catch(() => toast.error("シフトデータ取得に失敗しました"))
             .finally(() => setLoading(false))
     }, []);
 
-    return { getSchedules, loading, schedules };
+    const Optimize = useCallback(() => {
+        setLoading(true);
+
+        const optimizeParam = {
+            database_id: databaseInfo?.id,
+            dont_assign_too_much_overtime_in_day: true,
+            dont_assign_off_shift_if_work_day: true,
+            assign_fix_schedule_if_exists: true,
+            dont_assign_invalid_shift: true,
+            dont_assign_invalid_skill: true,
+            assign_only_one_kind_of_shift_and_skill_in_cycle: true,
+            dont_assign_prohibited_shift_transition: true,
+            assign_off_shift_at_least_one_in_cycle: true,
+            assign_appropriate_shift_and_overtime_for_man_hours: true,
+            assign_appropriate_shift_and_overtime_for_man_hours_min: true,
+            assign_appropriate_shift_and_overtime_for_man_hours_max: true,
+            assign_appropriate_shift_and_overtime_for_man_hours_min_tolerance: 10,
+            assign_appropriate_shift_and_overtime_for_man_hours_max_tolerance: 10,
+            dont_assign_too_much_overtime_in_month: true
+        }
+
+        ////データ取得
+        DatabaseAPI.post("/optimize/", optimizeParam).then((res) => {
+
+            if (res.status != 200) {
+                throw new Error(res.statusText)
+            }
+
+            console.log("res", res)
+
+            ////loading
+            getSchedules();
+
+            ////DB処理を後で記述
+            toast.success("シフト最適化を実行しました")
+        })
+            .catch((e) => toast.error("シフト最適化に失敗しました" + e))
+            .finally(() => setLoading(false))
+    }, []);
+
+    return { getSchedules, Optimize, loading, schedules };
 };
