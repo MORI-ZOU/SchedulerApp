@@ -1,13 +1,16 @@
 import { FC, useEffect, useState } from "react"
 import Modal from "react-modal";
 import { Employee } from "../../../types/Employee";
-import { EmployeeDetail } from "../../../types/EmployeeDetail";
-import { valid_shift } from "../../../types/valid_shift";
-import { valid_skill } from "../../../types/valid_skill";
 import { DateOnly } from "../../../types/DateOnly";
+import { ShiftType } from "../../../types/ShiftType";
+import { Skill } from "../../../types/Skill";
+import { ShiftSelector } from "./ShiftSelector";
+import { SkillSelector } from "./SkillSelector";
 
 type Props = {
     employee: Employee;
+    shifts: Array<ShiftType>;
+    skills: Array<Skill>;
     isOpen: boolean;
     onRequestClose: () => void;
     onSave: (updatedEmployee: Employee) => void;
@@ -23,70 +26,46 @@ const defaultEmployee: Employee = {
         cycle_start_date: new DateOnly(2024, 9, 1),
         enable_prohibited_shift_transitions: true
     },
-    valid_shift: [],
-    valid_skill: []
+    valid_shifts: [],
+    valid_skills: []
 };
 
 export const EmployeeDetailModal: FC<Props> = (props) => {
-    const { employee, isOpen, onRequestClose, onSave } = props;
+    const { employee, shifts, skills, isOpen, onRequestClose, onSave } = props;
     const [updatedEmployee, setUpdatedEmployee] = useState<Employee>(defaultEmployee);
 
     useEffect(() => {
         setUpdatedEmployee(employee);
     }, [employee]);
 
-    const onChangeField = <T extends keyof EmployeeDetail>(field: T, value: EmployeeDetail[T]) => {
-        setUpdatedEmployee(prevState => ({
-            ...prevState,
+    // const onChangeField = <T extends keyof EmployeeDetail>(field: T, value: EmployeeDetail[T]) => {
+    //     setUpdatedEmployee(prevState => ({
+    //         ...prevState,
+    //         employee_detail: {
+    //             ...prevState.employee_detail,
+    //             [field]: value,
+    //         }
+    //     }));
+    // };
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value, type } = e.target;
+        setUpdatedEmployee(prev => ({
+            ...prev,
             employee_detail: {
-                ...prevState.employee_detail,
-                [field]: value,
-            }
+                ...prev.employee_detail,
+                [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value,
+            },
         }));
     };
 
-    const onChangeValidShift = (index: number, field: keyof valid_shift, value: any) => {
-        setUpdatedEmployee(prevState => {
-            const newValidShifts = [...prevState.valid_shift];
-            newValidShifts[index] = { ...newValidShifts[index], [field]: value };
-            return { ...prevState, valid_shift: newValidShifts };
-        });
-    };
-
-    const addValidShift = () => {
-        setUpdatedEmployee(prevState => ({
-            ...prevState,
-            valid_shift: [...prevState.valid_shift, { employee_id: employee.employee_detail.id, shift_id: '' }],
+    const handleStartDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setUpdatedEmployee(prev => ({
+            ...prev,
+            employee_detail: {
+                ...prev.employee_detail,
+                cycle_start_date: DateOnly.fromString(e.target.value),
+            },
         }));
-    };
-
-    const removeValidShift = (index: number) => {
-        setUpdatedEmployee(prevState => {
-            const newValidShifts = prevState.valid_shift.filter((_, i) => i !== index);
-            return { ...prevState, valid_shift: newValidShifts };
-        });
-    };
-
-    const onChangeValidSkill = (index: number, field: keyof valid_skill, value: any) => {
-        setUpdatedEmployee(prevState => {
-            const newValidSkills = [...prevState.valid_skill];
-            newValidSkills[index] = { ...newValidSkills[index], [field]: value };
-            return { ...prevState, valid_skill: newValidSkills };
-        });
-    };
-
-    const addValidSkill = () => {
-        setUpdatedEmployee(prevState => ({
-            ...prevState,
-            valid_skill: [...prevState.valid_skill, { employee_id: employee.employee_detail.id, skill_id: '', task_efficiency: 0 }],
-        }));
-    };
-
-    const removeValidSkill = (index: number) => {
-        setUpdatedEmployee(prevState => {
-            const newValidSkills = prevState.valid_skill.filter((_, i) => i !== index);
-            return { ...prevState, valid_skill: newValidSkills };
-        });
     };
 
     const handleSave = () => {
@@ -119,89 +98,100 @@ export const EmployeeDetailModal: FC<Props> = (props) => {
                     </svg>
                 </button>
                 <h1 className="text-2xl font-bold mb-4">従業員詳細</h1>
-                <label className="block text-sm font-medium text-gray-700">名前</label>
-                <input
-                    value={updatedEmployee.employee_detail.name}
-                    onChange={(e) => onChangeField('name', e.target.value)}
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-                />
-                <label className="block text-sm font-medium text-gray-700">1日の最大残業時間</label>
-                <input
-                    value={updatedEmployee.employee_detail.max_overtime_hours_per_day}
-                    onChange={(e) => onChangeField("max_overtime_hours_per_day", parseFloat(e.target.value))}
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-                />
-                <label className="block text-sm font-medium text-gray-700">1ヶ月の最大残業時間</label>
-                <input
-                    value={updatedEmployee.employee_detail.max_overtime_hours_per_month}
-                    onChange={(e) => onChangeField("max_overtime_hours_per_month", parseFloat(e.target.value))}
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-                />
-                <label className="block text-sm font-medium text-gray-700">サイクル日数</label>
-                <input
-                    value={updatedEmployee.employee_detail.work_days_per_cycle}
-                    onChange={(e) => onChangeField("work_days_per_cycle", parseFloat(e.target.value))}
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-                />
-                <label className="block text-sm font-medium text-gray-700">サイクル開始日</label>
-                <input
-                    value={updatedEmployee.employee_detail.cycle_start_date.toString()}
-                    onChange={(e) => onChangeField("cycle_start_date", DateOnly.fromString(e.target.value))}
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-                />
-                <div className="mt-4 bg-teal-100 p-4 rounded">
-                    <h3 className="font-bold">有効なシフト</h3>
-                    {updatedEmployee.valid_shift.map((shift, index) => (
-                        <div key={index} className="mb-4 border p-2 rounded">
-                            <label className="block text-sm font-medium text-gray-700">シフトID</label>
-                            <input
-                                type="text"
-                                value={shift.shift_id}
-                                onChange={(e) => onChangeValidShift(index, 'shift_id', e.target.value)}
-                                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-                            />
-                            {/* <label className="block text-sm font-medium text-gray-700">社員ID</label>
-                            <input
-                                type="text"
-                                value={shift.employee_id}
-                                onChange={(e) => onChangeValidShift(index, 'employee_id', e.target.value)}
-                                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-                            /> */}
-                            <button onClick={() => removeValidShift(index)} className="mt-2 text-white bg-red-500 hover:bg-red-600 rounded px-2 py-1">削除</button>
-                        </div>
-                    ))}
-                    <button onClick={addValidShift} className="mt-2 text-white bg-blue-500 hover:bg-blue-600 rounded px-2 py-1">シフトを追加</button>
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">名前</label>
+                    <input
+                        type="text"
+                        name="name"
+                        value={updatedEmployee.employee_detail.name}
+                        onChange={handleInputChange}
+                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                    />
                 </div>
-                <div className="mt-4 bg-teal-100 p-4 rounded">
-                    <h3 className="font-bold">有効なスキル</h3>
-                    {updatedEmployee.valid_skill.map((skill, index) => (
-                        <div key={index} className="mb-4 border p-2 rounded">
-                            <label className="block text-sm font-medium text-gray-700">スキルID</label>
-                            <input
-                                type="text"
-                                value={skill.skill_id}
-                                onChange={(e) => onChangeValidSkill(index, 'skill_id', e.target.value)}
-                                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-                            />
-                            <label className="block text-sm font-medium text-gray-700">効率</label>
-                            <input
-                                type="number"
-                                value={skill.task_efficiency}
-                                onChange={(e) => onChangeValidSkill(index, 'task_efficiency', parseFloat(e.target.value))}
-                                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-                            />
-                            <button onClick={() => removeValidSkill(index)} className="mt-2 text-white bg-red-500 hover:bg-red-600 rounded px-2 py-1">削除</button>
-                        </div>
-                    ))}
-                    <button onClick={addValidSkill} className="mt-2 text-white bg-blue-500 hover:bg-blue-600 rounded px-2 py-1">スキルを追加</button>
+
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">1日の最大残業時間</label>
+                    <input
+                        type="number"
+                        name="max_overtime_hours_per_day"
+                        value={updatedEmployee.employee_detail.max_overtime_hours_per_day}
+                        onChange={handleInputChange}
+                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                    />
                 </div>
-                <button
-                    onClick={handleSave}
-                    className="mt-4 text-white bg-gray-400 border-0 py-2 px-4 focus:outline-none hover:bg-gray-500 rounded"
-                >
-                    保存
-                </button>
+
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">1ヶ月の最大残業時間</label>
+                    <input
+                        type="number"
+                        name="max_overtime_hours_per_month"
+                        value={updatedEmployee.employee_detail.max_overtime_hours_per_month}
+                        onChange={handleInputChange}
+                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                    />
+                </div>
+
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">サイクル日数</label>
+                    <input
+                        type="number"
+                        name="work_days_per_cycle"
+                        value={updatedEmployee.employee_detail.work_days_per_cycle}
+                        onChange={handleInputChange}
+                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                    />
+                </div>
+
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">サイクル開始日</label>
+                    <input
+                        type="date"
+                        name="cycle_start_date"
+                        value={updatedEmployee.employee_detail.cycle_start_date.toString()}
+                        onChange={handleStartDateChange}
+                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                    />
+                </div>
+
+                <div className="flex items-center">
+                    <input
+                        type="checkbox"
+                        id="enable_prohibited_shift_transitions"
+                        name="enable_prohibited_shift_transitions"
+                        checked={updatedEmployee.employee_detail.enable_prohibited_shift_transitions}
+                        onChange={handleInputChange}
+                        className="h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
+                    />
+                    <label
+                        htmlFor="enable_prohibited_shift_transitions"
+                        className="ml-2 text-sm text-gray-700"
+                    >
+                        禁止されたシフト遷移を守る
+                    </label>
+                </div>
+
+                <ShiftSelector
+                    availableShifts={shifts}
+                    selectedShifts={updatedEmployee.valid_shifts}
+                    employeeId={updatedEmployee.employee_detail.id}
+                    onChange={(shifts) => setUpdatedEmployee(prev => ({ ...prev, valid_shifts: shifts }))}
+                />
+
+                <SkillSelector
+                    availableSkills={skills}
+                    selectedSkills={updatedEmployee.valid_skills}
+                    employeeId={updatedEmployee.employee_detail.id}
+                    onChange={(skills) => setUpdatedEmployee(prev => ({ ...prev, valid_skills: skills }))}
+                />
             </div>
-        </Modal>
+
+
+            <button
+                onClick={handleSave}
+                className="mt-4 text-white bg-gray-400 border-0 py-2 px-4 focus:outline-none hover:bg-gray-500 rounded"
+            >
+                保存
+            </button>
+        </Modal >
     )
 }

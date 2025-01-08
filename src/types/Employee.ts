@@ -4,6 +4,6 @@ import { valid_skill } from "./valid_skill";
 
 export type Employee = {
     employee_detail: EmployeeDetail;
-    valid_shift: Array<valid_shift>;
-    valid_skill: Array<valid_skill>;
+    valid_shifts: Array<valid_shift>;
+    valid_skills: Array<valid_skill>;
 }

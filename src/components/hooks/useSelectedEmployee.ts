@@ -13,8 +13,8 @@ const defaultEmployee: Employee = {
         cycle_start_date: new DateOnly(2024, 9, 1),
         enable_prohibited_shift_transitions: true
     },
-    valid_shift: [],
-    valid_skill: []
+    valid_shifts: [],
+    valid_skills: []
 };
 
 type Props = {

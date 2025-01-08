@@ -43,7 +43,7 @@ export const EmployeeCard: FC<Props> = (props) => {
             <div className="text-gray-600 mb-2">
                 <h3 className="font-medium">有効なシフト:</h3>
                 <ul>
-                    {employee.valid_shift.map((shift, index) => (
+                    {employee.valid_shifts.map((shift, index) => (
                         <li key={index}>シフトID: {shift.shift_id}</li>
                     ))}
                 </ul>
@@ -51,7 +51,7 @@ export const EmployeeCard: FC<Props> = (props) => {
             <div className="text-gray-600 mb-2">
                 <h3 className="font-medium">有効なスキル:</h3>
                 <ul>
-                    {employee.valid_skill.map((skill, index) => (
+                    {employee.valid_skills.map((skill, index) => (
                         <li key={index}>
                             スキルID: {skill.skill_id}, 効率: {skill.task_efficiency}
                         </li>

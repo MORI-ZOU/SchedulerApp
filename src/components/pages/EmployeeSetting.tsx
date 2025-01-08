@@ -6,6 +6,8 @@ import { useSelectEmployee } from "../hooks/useSelectedEmployee";
 import { Employee } from "../../types/Employee";
 import { toast } from "react-toastify";
 import { DateOnly } from "../../types/DateOnly";
+import { useShifts } from "../hooks/useShifts";
+import { useSkills } from "../hooks/useSkills";
 
 const defaultEmployee: Employee = {
     employee_detail: {
@@ -17,12 +19,14 @@ const defaultEmployee: Employee = {
         cycle_start_date: new DateOnly(2024, 4, 1),
         enable_prohibited_shift_transitions: true
     },
-    valid_shift: [],
-    valid_skill: []
+    valid_shifts: [],
+    valid_skills: []
 };
 
 export const EmployeeSetting = () => {
     const { getEmployees, saveEmployees, deleteEmployees, employees, loading } = useEmployees();
+    const { getShifts, shifts } = useShifts();
+    const { getSkills, skills } = useSkills();
     const [data, setData] = useState<Employee[]>(employees)
     const { onSelectEmployee, selectedEmployee } = useSelectEmployee();
     const [isModalOpen, setModalOpen] = useState(false);
@@ -34,6 +38,8 @@ export const EmployeeSetting = () => {
     }, [data, onSelectEmployee, openModal])
 
     useEffect(() => getEmployees(), [getEmployees]);
+    useEffect(() => getShifts(), [getShifts]);
+    useEffect(() => getSkills(), [getSkills]);
     useEffect(() => setData(employees), [employees])
 
     const onClickAdd = () => {
@@ -68,6 +74,7 @@ export const EmployeeSetting = () => {
             members[index] = updatedEmployee;
             setData(members);
 
+            console.log(`modalUpdated:${updatedEmployee}`)
             // 更新成功を通知（例えば、トースト通知を使用するなど）
             toast.success(`作業者 ${id} のデータが更新されました。「保存」ボタンで保存してください`);
         } else {
@@ -77,10 +84,9 @@ export const EmployeeSetting = () => {
 
     const onClickSave = (() => {
         saveEmployees(data);
-        console.log("Data saved:", data)
     })
 
-    console.log({ employees })
+    console.log(employees)
 
     return (
         <>
@@ -104,7 +110,7 @@ export const EmployeeSetting = () => {
                             作業者追加
                         </button>
                         <button
-                            onClick={onClickSave}
+                            onClick={() => onClickSave()}
                             className="text-white bg-blue-500 hover:bg-blue-600 rounded px-4 py-2"
                         >
                             保存
@@ -115,6 +121,8 @@ export const EmployeeSetting = () => {
             <EmployeeDetailModal
                 employee={selectedEmployee}
                 isOpen={isModalOpen}
+                shifts={shifts}
+                skills={skills}
                 onRequestClose={closeModal}
                 onSave={onClickSaveModal}
             />

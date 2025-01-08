@@ -10,212 +10,213 @@ import { HexColor } from '../../types/HexColor';
 import { Overtime } from '../../types/Overtime';
 import { useLogin } from './useLogin';
 import DatabaseAPI from '../api/DatabaseAPI';
+import { OptimizeParameter } from '../../types/OptimizeParameter';
 
-const emps: Array<Employee> = [
-    {
-        employee_detail: {
-            id: "1",
-            name: "テスト太郎",
-            max_overtime_hours_per_day: 4,
-            max_overtime_hours_per_month: 80,
-            work_days_per_cycle: 5,
-            cycle_start_date: new DateOnly(2024, 9, 1),
-            enable_prohibited_shift_transitions: false,
-        },
-        valid_shift: [{ employee_id: "1", shift_id: "日勤" }, { employee_id: "1", shift_id: "夜勤" }],
-        valid_skill: [{ employee_id: "1", skill_id: "SKILL1", task_efficiency: 1.0 }]
-    },
-    {
-        employee_detail: {
-            id: "2",
-            name: "テスト次郎",
-            max_overtime_hours_per_day: 4,
-            max_overtime_hours_per_month: 20,
-            work_days_per_cycle: 4,
-            cycle_start_date: new DateOnly(2024, 9, 2),
-            enable_prohibited_shift_transitions: false,
-        },
-        valid_shift: [{ employee_id: "2", shift_id: "SHIFT1" }],
-        valid_skill: [{ employee_id: "2", skill_id: "SKILL1", task_efficiency: 0.9 }, { employee_id: "2", skill_id: "SKILL1", task_efficiency: 1.2 }]
-    },]
+// const emps: Array<Employee> = [
+//     {
+//         employee_detail: {
+//             id: "1",
+//             name: "テスト太郎",
+//             max_overtime_hours_per_day: 4,
+//             max_overtime_hours_per_month: 80,
+//             work_days_per_cycle: 5,
+//             cycle_start_date: new DateOnly(2024, 9, 1),
+//             enable_prohibited_shift_transitions: false,
+//         },
+//         valid_shifts: [{ employee_id: "1", shift_id: "日勤" }, { employee_id: "1", shift_id: "夜勤" }],
+//         valid_skills: [{ employee_id: "1", skill_id: "SKILL1", task_efficiency: 1.0 }]
+//     },
+//     {
+//         employee_detail: {
+//             id: "2",
+//             name: "テスト次郎",
+//             max_overtime_hours_per_day: 4,
+//             max_overtime_hours_per_month: 20,
+//             work_days_per_cycle: 4,
+//             cycle_start_date: new DateOnly(2024, 9, 2),
+//             enable_prohibited_shift_transitions: false,
+//         },
+//         valid_shifts: [{ employee_id: "2", shift_id: "SHIFT1" }],
+//         valid_skills: [{ employee_id: "2", skill_id: "SKILL1", task_efficiency: 0.9 }, { employee_id: "2", skill_id: "SKILL1", task_efficiency: 1.2 }]
+//     },]
 
 
-const sft: Array<ShiftType> = [
-    {
-        id: "a",
-        name: "日勤",
-        color: new HexColor("#ea3e3e"),
-        startTime: new Time(8, 0, 0),
-        endTime: new Time(17, 0, 0),
-    },
-    {
-        id: "b",
-        name: "夜勤",
-        color: new HexColor("#18d115"),
-        startTime: new Time(21, 0, 0),
-        endTime: new Time(6, 0, 0),
-    },
-];
+// const sft: Array<ShiftType> = [
+//     {
+//         id: "a",
+//         name: "日勤",
+//         color: new HexColor("#ea3e3e"),
+//         startTime: new Time(8, 0, 0),
+//         endTime: new Time(17, 0, 0),
+//     },
+//     {
+//         id: "b",
+//         name: "夜勤",
+//         color: new HexColor("#18d115"),
+//         startTime: new Time(21, 0, 0),
+//         endTime: new Time(6, 0, 0),
+//     },
+// ];
 
-const skl: Array<Skill> = [
-    {
-        id: "a",
-        name: "TaskA",
-        color: new HexColor("#ec1818"),
-    },
-    {
-        id: "b",
-        name: "TaskB",
-        color: new HexColor("#2adf4e"),
-    },
-    {
-        id: "c",
-        name: "TaskC",
-        color: new HexColor("#0a18e6"),
-    },]
+// const skl: Array<Skill> = [
+//     {
+//         id: "a",
+//         name: "TaskA",
+//         color: new HexColor("#ec1818"),
+//     },
+//     {
+//         id: "b",
+//         name: "TaskB",
+//         color: new HexColor("#2adf4e"),
+//     },
+//     {
+//         id: "c",
+//         name: "TaskC",
+//         color: new HexColor("#0a18e6"),
+//     },]
 
-const ot: Array<Overtime> = [
-    {
-        id: '1',
-        color: new HexColor('#FF5733'),
-        overtime_hours: 1
-    },
-    {
-        id: '2',
-        color: new HexColor('#33FF57'),
-        overtime_hours: 2
-    },
-    {
-        id: '3',
-        color: new HexColor('#3357FF'),
-        overtime_hours: 4
-    },
-];
+// const ot: Array<Overtime> = [
+//     {
+//         id: '1',
+//         color: new HexColor('#FF5733'),
+//         overtime_hours: 1
+//     },
+//     {
+//         id: '2',
+//         color: new HexColor('#33FF57'),
+//         overtime_hours: 2
+//     },
+//     {
+//         id: '3',
+//         color: new HexColor('#3357FF'),
+//         overtime_hours: 4
+//     },
+// ];
 
-const dataSource: Array<OptimizedSchedule> = [
-    {
-        date: new DateOnly(2024, 9, 1),
-        employee: emps[0],
-        shift: sft[0]
-        ,
-        skill: skl[0],
-        defaultWorktimeHour: 8,
-        isFixOvertime: false,
-        isFixShift: false,
-        overtime: ot[0],
-        overtimeHours: 1,
-        totalWorktimeHours: 9
-    },
-    {
-        date: new DateOnly(2024, 9, 2),
-        employee: emps[0],
-        shift: sft[0],
-        skill: skl[0],
-        defaultWorktimeHour: 8,
-        isFixOvertime: false,
-        isFixShift: false,
-        overtime: ot[0],
-        overtimeHours: 1,
-        totalWorktimeHours: 9
-    },
-    {
-        date: new DateOnly(2024, 9, 3),
-        employee: emps[0],
-        shift: sft[0],
-        skill: skl[0],
-        defaultWorktimeHour: 8,
-        isFixOvertime: false,
-        isFixShift: false,
-        overtime: ot[0],
-        overtimeHours: 1,
-        totalWorktimeHours: 9
-    },
-    {
-        date: new DateOnly(2024, 9, 4),
-        employee: emps[0],
-        shift: sft[0],
-        skill: skl[0],
-        defaultWorktimeHour: 8,
-        isFixOvertime: false,
-        isFixShift: false,
-        overtime: ot[0],
-        overtimeHours: 1,
-        totalWorktimeHours: 9
-    },
-    {
-        date: new DateOnly(2024, 9, 5),
-        employee: emps[0],
-        shift: sft[0],
-        skill: skl[0],
-        defaultWorktimeHour: 8,
-        isFixOvertime: false,
-        isFixShift: false,
-        overtime: ot[0],
-        overtimeHours: 1,
-        totalWorktimeHours: 9
-    },
-    {
-        date: new DateOnly(2024, 9, 1),
-        employee: emps[1],
-        shift: sft[1]
-        ,
-        skill: skl[1],
-        defaultWorktimeHour: 8,
-        isFixOvertime: false,
-        isFixShift: false,
-        overtime: ot[0],
-        overtimeHours: 1,
-        totalWorktimeHours: 9
-    },
-    {
-        date: new DateOnly(2024, 9, 2),
-        employee: emps[1],
-        shift: sft[1],
-        skill: skl[1],
-        defaultWorktimeHour: 8,
-        isFixOvertime: false,
-        isFixShift: false,
-        overtime: ot[2],
-        overtimeHours: 1,
-        totalWorktimeHours: 9
-    },
-    {
-        date: new DateOnly(2024, 9, 3),
-        employee: emps[1],
-        shift: sft[1],
-        skill: skl[1],
-        defaultWorktimeHour: 8,
-        isFixOvertime: false,
-        isFixShift: false,
-        overtime: ot[0],
-        overtimeHours: 1,
-        totalWorktimeHours: 9
-    },
-    {
-        date: new DateOnly(2024, 9, 4),
-        employee: emps[1],
-        shift: sft[1],
-        skill: skl[1],
-        defaultWorktimeHour: 8,
-        isFixOvertime: false,
-        isFixShift: false,
-        overtime: ot[0],
-        overtimeHours: 1,
-        totalWorktimeHours: 9
-    },
-    {
-        date: new DateOnly(2024, 9, 5),
-        employee: emps[1],
-        shift: sft[1],
-        skill: skl[1],
-        defaultWorktimeHour: 8,
-        isFixOvertime: false,
-        isFixShift: false,
-        overtime: ot[1],
-        overtimeHours: 1,
-        totalWorktimeHours: 9
-    },
-];
+// const dataSource: Array<OptimizedSchedule> = [
+//     {
+//         date: new DateOnly(2024, 9, 1),
+//         employee: emps[0],
+//         shift: sft[0]
+//         ,
+//         skill: skl[0],
+//         defaultWorktimeHour: 8,
+//         isFixOvertime: false,
+//         isFixShift: false,
+//         overtime: ot[0],
+//         overtimeHours: 1,
+//         totalWorktimeHours: 9
+//     },
+//     {
+//         date: new DateOnly(2024, 9, 2),
+//         employee: emps[0],
+//         shift: sft[0],
+//         skill: skl[0],
+//         defaultWorktimeHour: 8,
+//         isFixOvertime: false,
+//         isFixShift: false,
+//         overtime: ot[0],
+//         overtimeHours: 1,
+//         totalWorktimeHours: 9
+//     },
+//     {
+//         date: new DateOnly(2024, 9, 3),
+//         employee: emps[0],
+//         shift: sft[0],
+//         skill: skl[0],
+//         defaultWorktimeHour: 8,
+//         isFixOvertime: false,
+//         isFixShift: false,
+//         overtime: ot[0],
+//         overtimeHours: 1,
+//         totalWorktimeHours: 9
+//     },
+//     {
+//         date: new DateOnly(2024, 9, 4),
+//         employee: emps[0],
+//         shift: sft[0],
+//         skill: skl[0],
+//         defaultWorktimeHour: 8,
+//         isFixOvertime: false,
+//         isFixShift: false,
+//         overtime: ot[0],
+//         overtimeHours: 1,
+//         totalWorktimeHours: 9
+//     },
+//     {
+//         date: new DateOnly(2024, 9, 5),
+//         employee: emps[0],
+//         shift: sft[0],
+//         skill: skl[0],
+//         defaultWorktimeHour: 8,
+//         isFixOvertime: false,
+//         isFixShift: false,
+//         overtime: ot[0],
+//         overtimeHours: 1,
+//         totalWorktimeHours: 9
+//     },
+//     {
+//         date: new DateOnly(2024, 9, 1),
+//         employee: emps[1],
+//         shift: sft[1]
+//         ,
+//         skill: skl[1],
+//         defaultWorktimeHour: 8,
+//         isFixOvertime: false,
+//         isFixShift: false,
+//         overtime: ot[0],
+//         overtimeHours: 1,
+//         totalWorktimeHours: 9
+//     },
+//     {
+//         date: new DateOnly(2024, 9, 2),
+//         employee: emps[1],
+//         shift: sft[1],
+//         skill: skl[1],
+//         defaultWorktimeHour: 8,
+//         isFixOvertime: false,
+//         isFixShift: false,
+//         overtime: ot[2],
+//         overtimeHours: 1,
+//         totalWorktimeHours: 9
+//     },
+//     {
+//         date: new DateOnly(2024, 9, 3),
+//         employee: emps[1],
+//         shift: sft[1],
+//         skill: skl[1],
+//         defaultWorktimeHour: 8,
+//         isFixOvertime: false,
+//         isFixShift: false,
+//         overtime: ot[0],
+//         overtimeHours: 1,
+//         totalWorktimeHours: 9
+//     },
+//     {
+//         date: new DateOnly(2024, 9, 4),
+//         employee: emps[1],
+//         shift: sft[1],
+//         skill: skl[1],
+//         defaultWorktimeHour: 8,
+//         isFixOvertime: false,
+//         isFixShift: false,
+//         overtime: ot[0],
+//         overtimeHours: 1,
+//         totalWorktimeHours: 9
+//     },
+//     {
+//         date: new DateOnly(2024, 9, 5),
+//         employee: emps[1],
+//         shift: sft[1],
+//         skill: skl[1],
+//         defaultWorktimeHour: 8,
+//         isFixOvertime: false,
+//         isFixShift: false,
+//         overtime: ot[1],
+//         overtimeHours: 1,
+//         totalWorktimeHours: 9
+//     },
+// ];
 
 export const useOptimizeSchedule = () => {
     const [loading, setLoading] = useState<boolean>(false);
@@ -243,14 +244,14 @@ export const useOptimizeSchedule = () => {
                         max_overtime_hours_per_day: val.employee.max_overtime_hours_per_day,
                         max_overtime_hours_per_month: val.employee.max_overtime_hours_per_month,
                         work_days_per_cycle: val.employee.work_days_per_cycle,
-                        cycle_start_date: val.employee.cycle_start_date,
+                        cycle_start_date: DateOnly.fromString(val.employee.cycle_start_date),
                         enable_prohibited_shift_transitions: val.employee.enable_prohibited_shift_transitions
                     },
-                    valid_shift: val.employee.valid_shifts.map((shift: any) => ({
+                    valid_shifts: val.employee.valid_shifts.map((shift: any) => ({
                         employee_id: shift.employee_id,
                         shift_id: shift.shift_id
                     })),
-                    valid_skill: val.employee.valid_skills.map((skill: any) => ({
+                    valid_skills: val.employee.valid_skills.map((skill: any) => ({
                         employee_id: skill.employee_id,
                         skill_id: skill.skill_id,
                         task_efficiency: skill.task_efficiency
@@ -273,11 +274,11 @@ export const useOptimizeSchedule = () => {
                     color: new HexColor(val.overtime.color),
                     overtime_hours: val.overtime.overtime_hours
                 },
-                default_worktime_hours: val.default_worktime_hours,
-                overtime_hours: val.overtime_hours,
-                total_worktime_hours: val.total_worktime_hours,
-                is_fixed_shift: val.is_fixed_shift,
-                is_fixed_overtime: val.is_fixed_overtime
+                defaultWorktimeHour: val.default_worktime_hours,
+                overtimeHours: val.overtime_hours,
+                totalWorktimeHours: val.total_worktime_hours,
+                isFixShift: val.is_fixed_shift,
+                isFixOvertime: val.is_fixed_overtime
             }));
 
 
@@ -291,29 +292,11 @@ export const useOptimizeSchedule = () => {
             .finally(() => setLoading(false))
     }, []);
 
-    const Optimize = useCallback(() => {
+    const Optimize = useCallback((props: OptimizeParameter) => {
         setLoading(true);
 
-        const optimizeParam = {
-            database_id: databaseInfo?.id,
-            dont_assign_too_much_overtime_in_day: true,
-            dont_assign_off_shift_if_work_day: true,
-            assign_fix_schedule_if_exists: true,
-            dont_assign_invalid_shift: true,
-            dont_assign_invalid_skill: true,
-            assign_only_one_kind_of_shift_and_skill_in_cycle: true,
-            dont_assign_prohibited_shift_transition: true,
-            assign_off_shift_at_least_one_in_cycle: true,
-            assign_appropriate_shift_and_overtime_for_man_hours: true,
-            assign_appropriate_shift_and_overtime_for_man_hours_min: true,
-            assign_appropriate_shift_and_overtime_for_man_hours_max: true,
-            assign_appropriate_shift_and_overtime_for_man_hours_min_tolerance: 10,
-            assign_appropriate_shift_and_overtime_for_man_hours_max_tolerance: 10,
-            dont_assign_too_much_overtime_in_month: true
-        }
-
         ////データ取得
-        DatabaseAPI.post("/optimize/", optimizeParam).then((res) => {
+        DatabaseAPI.post("/optimize/", props).then((res) => {
 
             if (res.status != 200) {
                 throw new Error(res.statusText)
