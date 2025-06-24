@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { RangeComponent, TabulatorFull as Tabulator } from 'tabulator-tables';
 import "tabulator-tables/dist/css/tabulator.min.css";
-import { OptimizedSchedule } from '../../types/OptimizedSchedule';
+import { OptimizedSchedule } from '../../../types/OptimizedSchedule';
 import { Icon } from '@iconify/react';
 import { createRoot } from 'react-dom/client';
 
@@ -46,7 +46,11 @@ export const ScheduleTable: React.FC<ScheduleTableProps> = ({ schedules, onFixSh
     // テーブルに表示するデータを作る
     const tableData: TransformedRow[] = Array.from(new Set(localSchedules.map(s => s.employee.employee_detail.name))).map(employeeName => {
       const employeeSchedules = localSchedules.filter(s => s.employee.employee_detail.name === employeeName);
-      const row: any = { employeeName };
+      const row: any = {
+        employeeName: employeeName,
+        totalWorkhours: employeeSchedules.reduce((sum, row) => sum + row.totalWorktimeHours, 0),
+        totalOvertimes: employeeSchedules.reduce((sum, row) => sum + row.overtimeHours, 0),
+      };
       console.log("schedule", localSchedules)
 
       employeeSchedules.forEach(schedule => {
@@ -78,6 +82,17 @@ export const ScheduleTable: React.FC<ScheduleTableProps> = ({ schedules, onFixSh
         width: 150,
         frozen: true,
         headerSort: false
+      },
+      {
+        title: "合計労働時間",
+        field: "totalWorkhours",
+        headerSort: false
+      },
+      {
+        title: "合計残業時間",
+        field: "totalOvertimes",
+        headerSort: false
+
       },
       ...dates.map(date => ({
         title: date,
@@ -118,7 +133,7 @@ export const ScheduleTable: React.FC<ScheduleTableProps> = ({ schedules, onFixSh
     ]
 
     const table = new Tabulator(tableRef.current, {
-      height: "70vh",
+      height: "40vh",
       // selectable: true,
       selectableRange: true,
       selectableRangeColumns: true,
@@ -228,7 +243,13 @@ export const ScheduleTable: React.FC<ScheduleTableProps> = ({ schedules, onFixSh
           固定解除
         </button>
       </div>
+      <span className='text-xl font-bold mb-5'>
+        シフト表
+      </span>
       <div ref={tableRef} className="w-full" />
+      <span className='text-xl font-bold mb-5'>
+        集計
+      </span>
     </div>
   );
 };

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useOptimizeSchedule } from '../hooks/useOptimizeSchedule';
 import { OptimizedSchedule } from '../../types/OptimizedSchedule';
-import { ScheduleTable } from '../organisms/SheduleTable';
+import { ScheduleTable } from '../organisms/tables/SheduleTable';
 import { toast } from 'react-toastify';
 import { useFixSchedule } from '../hooks/useFixSchedule';
 import { FixedShift } from '../../types/FixedShift';
@@ -54,8 +54,8 @@ export const OptimizedSchedulePage: React.FC = () => {
     assign_appropriate_shift_and_overtime_for_man_hours: true,
     assign_appropriate_shift_and_overtime_for_man_hours_min: true,
     assign_appropriate_shift_and_overtime_for_man_hours_max: true,
-    assign_appropriate_shift_and_overtime_for_man_hours_min_tolerance: 10,
-    assign_appropriate_shift_and_overtime_for_man_hours_max_tolerance: 10,
+    assign_appropriate_shift_and_overtime_for_man_hours_min_tolerance: 0,
+    assign_appropriate_shift_and_overtime_for_man_hours_max_tolerance: 0,
     dont_assign_too_much_overtime_in_month: true
   }
 
