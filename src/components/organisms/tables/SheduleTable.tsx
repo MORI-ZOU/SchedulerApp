@@ -7,6 +7,7 @@ import { createRoot } from 'react-dom/client';
 import { Manhour } from '../../../types/Manhour';
 import { FixedShift } from '../../../types/FixedShift';
 import { FixedOvertime } from '../../../types/FixedOvertime';
+import { HeaderLayout } from '../../templates/HeaderLayout';
 
 interface ScheduleTableProps {
   schedules: OptimizedSchedule[];
@@ -57,12 +58,30 @@ export const ScheduleTable: React.FC<ScheduleTableProps> = ({ schedules, manhour
       };
 
       employeeSchedules.forEach(schedule => {
+        // fixedShiftsから該当するエントリを検索
+        const isFixedShift = fixedShifts.some(fixedShift =>
+          fixedShift.date.toString() === schedule.date.toString() &&
+          fixedShift.employee_id === schedule.employee.employee_detail.id &&
+          fixedShift.skill_id === schedule.skill.id &&
+          fixedShift.shift_id === schedule.shift.id
+        );
+
+        // fixedOvertimesから該当するエントリを検索
+        const isFixedOvertime = fixedOvertimes.some(fixedOvertime =>
+          fixedOvertime.date.toString() === schedule.date.toString() &&
+          fixedOvertime.employee_id === schedule.employee.employee_detail.id &&
+          fixedOvertime.overtime_id === schedule.overtime.id
+        );
+
         row[schedule.date.toString()] = {
           shiftName: schedule.shift.name,
           skillName: schedule.skill.name,
           overtimeHours: schedule.overtime.overtime_hours,
-          isFixShift: schedule.isFixShift,
-          isFixOvertime: schedule.isFixOvertime
+          isFixShift: schedule.isFixShift || isFixedShift,
+          isFixOvertime: schedule.isFixOvertime || isFixedOvertime,
+          shiftColor: schedule.shift.color.toString(),
+          skillColor: schedule.skill.color.toString(),
+          overtimeColor: schedule.overtime.color.toString()
         };
       });
 
@@ -75,18 +94,26 @@ export const ScheduleTable: React.FC<ScheduleTableProps> = ({ schedules, manhour
         field: "employeeName",
         width: 150,
         frozen: true,
-        headerSort: false
+        headerSort: false,
+        headerVertical: true,
+        titleFormatter: "html",
+        titleFormatterParams: { style: "text-align: center;" }
       },
       {
         title: "合計労働時間",
         field: "totalWorkhours",
-        headerSort: false
+        headerSort: false,
+        headerVertical: true,
+        titleFormatter: "html",
+        titleFormatterParams: { style: "text-align: center;" }
       },
       {
         title: "合計残業時間",
         field: "totalOvertimes",
-        headerSort: false
-
+        headerSort: false,
+        headerVertical: true,
+        titleFormatter: "html",
+        titleFormatterParams: { style: "text-align: center;" }
       },
       ...dates.map(date => ({
         title: date,
@@ -94,16 +121,53 @@ export const ScheduleTable: React.FC<ScheduleTableProps> = ({ schedules, manhour
         // frozen: true,
         clipboard: true,
         headerSort: false,
+        headerHozAlign: "center",
+        headerVertAlign: "middle",
+
         formatter: function (cell: any) {
           const cellValue = cell.getValue();
-
           // HTML要素を作成
           const div = document.createElement('div');
-          div.className = 'flex items-center gap-1';
+          div.className = 'flex items-center gap-1 p-2 rounded';
 
+          // ShiftTypeの色で縁取りを設定
+          if (cellValue.shiftColor) {
+            div.style.border = `3px solid ${cellValue.shiftColor}`;
+            div.style.margin = '1px';
+            div.style.height = '100%';
+            div.style.boxSizing = 'border-box';
+          }
+
+          // Shift名のスパン（Shiftの色）
           const shiftSpan = document.createElement('span');
-          shiftSpan.textContent = `${cellValue.shiftName}(${cellValue.skillName})/${cellValue.overtimeHours}`;
+          shiftSpan.textContent = cellValue.shiftName;
+          shiftSpan.style.color = cellValue.shiftColor;
+          shiftSpan.style.fontWeight = 'bold';
           div.appendChild(shiftSpan);
+
+          // 括弧開始
+          const openParen = document.createElement('span');
+          openParen.textContent = '(';
+          div.appendChild(openParen);
+
+          // Skill名のスパン（Skillの色）
+          const skillSpan = document.createElement('span');
+          skillSpan.textContent = cellValue.skillName;
+          skillSpan.style.color = cellValue.skillColor;
+          skillSpan.style.fontWeight = 'bold';
+          div.appendChild(skillSpan);
+
+          // 括弧閉じとスラッシュ
+          const closeParen = document.createElement('span');
+          closeParen.textContent = ')/';
+          div.appendChild(closeParen);
+
+          // Overtime時間のスパン（Overtimeの色）
+          const overtimeSpan = document.createElement('span');
+          overtimeSpan.textContent = cellValue.overtimeHours.toString();
+          overtimeSpan.style.color = cellValue.overtimeColor;
+          overtimeSpan.style.fontWeight = 'bold';
+          div.appendChild(overtimeSpan);
 
           if (cellValue.isFixShift) {
             const iconContainer = document.createElement('div');
@@ -167,7 +231,7 @@ export const ScheduleTable: React.FC<ScheduleTableProps> = ({ schedules, manhour
     return () => {
       table.destroy();
     };
-  }, [localSchedules]);
+  }, [localSchedules, fixedShifts, fixedOvertimes]);
 
 
   return (
