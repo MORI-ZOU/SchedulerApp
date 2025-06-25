@@ -98,7 +98,7 @@ export const EmployeeDetailModal: FC<Props> = (props) => {
                     </svg>
                 </button>
                 <h1 className="text-2xl font-bold mb-4">従業員詳細</h1>
-                <div>
+                <div className="mb-4">
                     <label className="block text-sm font-medium text-gray-700">名前</label>
                     <input
                         type="text"
@@ -106,10 +106,11 @@ export const EmployeeDetailModal: FC<Props> = (props) => {
                         value={updatedEmployee.employee_detail.name}
                         onChange={handleInputChange}
                         className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                        placeholder="従業員名"
                     />
                 </div>
 
-                <div>
+                <div className="mb-4">
                     <label className="block text-sm font-medium text-gray-700">1日の最大残業時間</label>
                     <input
                         type="number"
@@ -117,10 +118,12 @@ export const EmployeeDetailModal: FC<Props> = (props) => {
                         value={updatedEmployee.employee_detail.max_overtime_hours_per_day}
                         onChange={handleInputChange}
                         className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                        min="0"
+                        step="0.5"
                     />
                 </div>
 
-                <div>
+                <div className="mb-4">
                     <label className="block text-sm font-medium text-gray-700">1ヶ月の最大残業時間</label>
                     <input
                         type="number"
@@ -128,10 +131,12 @@ export const EmployeeDetailModal: FC<Props> = (props) => {
                         value={updatedEmployee.employee_detail.max_overtime_hours_per_month}
                         onChange={handleInputChange}
                         className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                        min="0"
+                        step="0.5"
                     />
                 </div>
 
-                <div>
+                <div className="mb-4">
                     <label className="block text-sm font-medium text-gray-700">サイクル日数</label>
                     <input
                         type="number"
@@ -139,10 +144,11 @@ export const EmployeeDetailModal: FC<Props> = (props) => {
                         value={updatedEmployee.employee_detail.work_days_per_cycle}
                         onChange={handleInputChange}
                         className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                        min="1"
                     />
                 </div>
 
-                <div>
+                <div className="mb-4">
                     <label className="block text-sm font-medium text-gray-700">サイクル開始日</label>
                     <input
                         type="date"
@@ -153,7 +159,7 @@ export const EmployeeDetailModal: FC<Props> = (props) => {
                     />
                 </div>
 
-                <div className="flex items-center">
+                <div className="flex items-center mb-4">
                     <input
                         type="checkbox"
                         id="enable_prohibited_shift_transitions"
@@ -186,12 +192,14 @@ export const EmployeeDetailModal: FC<Props> = (props) => {
             </div>
 
 
-            <button
-                onClick={handleSave}
-                className="mt-4 text-white bg-gray-400 border-0 py-2 px-4 focus:outline-none hover:bg-gray-500 rounded"
-            >
-                保存
-            </button>
+            <div className="flex justify-end mt-6 pt-4 border-t">
+                <button
+                    onClick={handleSave}
+                    className="text-white bg-blue-500 hover:bg-blue-600 border-0 py-2 px-6 focus:outline-none rounded-md transition-colors"
+                >
+                    保存
+                </button>
+            </div>
         </Modal >
     )
 }

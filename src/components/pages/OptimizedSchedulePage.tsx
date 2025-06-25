@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useOptimizeSchedule } from '../hooks/useOptimizeSchedule';
 import { OptimizedSchedule } from '../../types/OptimizedSchedule';
-import { ScheduleTable } from '../organisms/tables/SheduleTable';
+import { ScheduleTable, SelectedCell } from '../organisms/tables/SheduleTable';
+import { SummaryScheduleTable } from '../organisms/tables/SummaryScheduleTable';
 import { toast } from 'react-toastify';
 import { useFixSchedule } from '../hooks/useFixSchedule';
 import { FixedShift } from '../../types/FixedShift';
@@ -9,6 +10,7 @@ import { FixedOvertime } from '../../types/FixedOvertime';
 import OptimizeModal from '../organisms/OptimizeModal';
 import { OptimizeParameter } from '../../types/OptimizeParameter';
 import { useLogin } from '../hooks/useLogin';
+import { useManhours } from '../hooks/useManhours';
 
 type Props = {
   date: string;
@@ -21,7 +23,9 @@ export const OptimizedSchedulePage: React.FC = () => {
   const { databaseInfo } = useLogin();
   const { getSchedules, Optimize, schedules, loading } = useOptimizeSchedule();
   const { getFixedShifts, saveFixedShifts, deleteFixedShifts, getFixedOvertimes, saveFixedOvertimes, deleteFixedOvertimes, loading: fixScheduleLoading, fixedShifts, fixedOvertimes } = useFixSchedule();
+  const { getManhours, manhours } = useManhours();
   const [localSchedules, setLocalSchedules] = useState<OptimizedSchedule[]>([]);
+  const [selectedCells, setSelectedCells] = useState<SelectedCell[]>([]);
   const [isModalOpen, setModalOpen] = useState<boolean>(false);
   const openModal = () => setModalOpen(true);
   const closeModal = () => setModalOpen(false);
@@ -29,6 +33,10 @@ export const OptimizedSchedulePage: React.FC = () => {
   useEffect(() => {
     getSchedules();
   }, [getSchedules]);
+
+  useEffect(() => {
+    getManhours()
+  }, [getManhours]);
 
   useEffect(() => {
     getFixedShifts();
@@ -59,7 +67,49 @@ export const OptimizedSchedulePage: React.FC = () => {
     dont_assign_too_much_overtime_in_month: true
   }
 
-  const handleFixShift = (updates: Array<Props>) => {
+  const handleCellSelectionChange = (cells: SelectedCell[]) => {
+    setSelectedCells(cells);
+  };
+
+  const handleFixShift = (fixType: 'shift' | 'overtime' | 'none') => {
+    if (selectedCells.length === 0) {
+      toast.error("セルを選択してください");
+      return;
+    }
+
+    const updates: Array<Props> = selectedCells.map(cell => {
+      const currentSchedule = localSchedules.find(s =>
+        s.date.toString() === cell.date &&
+        s.employee.employee_detail.name === cell.employeeName
+      );
+
+      if (!currentSchedule) {
+        return null;
+      }
+
+      // fixType に基づいてフラグを設定
+      const isFixShift = fixType === 'shift' ? true
+        : fixType === 'none' ? false
+          : currentSchedule.isFixShift;
+
+      const isFixOvertime = fixType === 'overtime' ? true
+        : fixType === 'none' ? false
+          : currentSchedule.isFixOvertime;
+
+      return {
+        date: cell.date,
+        employeeName: cell.employeeName,
+        isFixShift: isFixShift,
+        isFixOvertime: isFixOvertime
+      };
+    }).filter((update): update is Props => update !== null);
+
+    if (updates.length === 0) return;
+
+    handleFixShiftUpdate(updates);
+  };
+
+  const handleFixShiftUpdate = (updates: Array<Props>) => {
     toast.success("選択されたセルを固定しました。")
     const newFixedShift: FixedShift[] = [];
     const delFixedShift: FixedShift[] = [];
@@ -155,8 +205,35 @@ export const OptimizedSchedulePage: React.FC = () => {
   return (
     <>
       <div className='px-20 py-2'>
-        <ScheduleTable schedules={localSchedules} onFixShift={handleFixShift} />
-        <div className="flex justify-end w-full px-4 py-4 gap-1">
+        <div className='flex justify-end gap-1 mb-2'>
+          <span className="cell-count mr-4 flex items-center">
+            {selectedCells.length === 0
+              ? 'セル未選択'
+              : `選択されたセル: ${selectedCells.length}`}
+          </span>
+          <button
+            onClick={() => handleFixShift('shift')}
+            className="text-white bg-blue-500 hover:bg-blue-600 rounded px-4 py-2"
+            disabled={selectedCells.length === 0}
+          >
+            シフト固定
+          </button>
+          <button
+            onClick={() => handleFixShift('overtime')}
+            className="text-white bg-green-500 hover:bg-green-600 rounded px-4 py-2"
+            disabled={selectedCells.length === 0}
+          >
+            残業固定
+          </button>
+          <button
+            onClick={() => handleFixShift('none')}
+            className="text-white bg-red-500 hover:bg-red-600 rounded px-4 py-2"
+            disabled={selectedCells.length === 0}
+          >
+            固定解除
+          </button>
+        </div>
+        <div className="flex justify-end w-full gap-1">
           <button
             onClick={onClickOptimize}
             className="text-white bg-blue-500 hover:bg-blue-600 rounded px-4 py-2"
@@ -164,6 +241,15 @@ export const OptimizedSchedulePage: React.FC = () => {
             シフト生成
           </button>
         </div>
+        <ScheduleTable
+          schedules={localSchedules}
+          manhours={manhours}
+          fixedShifts={fixedShifts}
+          fixedOvertimes={fixedOvertimes}
+          onCellSelectionChange={handleCellSelectionChange}
+        />
+
+        <SummaryScheduleTable schedules={localSchedules} manhours={manhours} />
       </div>
       <OptimizeModal
         isOpen={isModalOpen}

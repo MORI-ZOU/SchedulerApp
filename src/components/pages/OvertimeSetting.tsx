@@ -66,6 +66,17 @@ export const OvertimeSetting: React.FC = () => {
             field: 'overtime_hours',
             editor: 'input',
             sorter: 'number',
+            validator: ['required', 'numeric', 'min:0'],
+            editorParams: {
+              type: 'number',
+              min: 0,
+              step: 0.5
+            },
+            mutator: (value) => {
+              // 文字列の場合は数値に変換
+              const numValue = parseFloat(value);
+              return isNaN(numValue) ? 0 : numValue;
+            }
           },
           {
             title: '削除',
@@ -76,15 +87,28 @@ export const OvertimeSetting: React.FC = () => {
               if ((e.target as HTMLElement).closest('.delete-btn')) {
                 const row = cell.getRow();
                 const id = row.getData().id;
-                toast.success(`残業(id: ${id})を削除しました。`);
+                // 削除処理を実行
                 deleteOvertimes([id]);
-                row.delete();
               }
             },
             headerSort: false,
             width: 100,
           },
         ],
+        cellEdited: function (cell) {
+          // セルが編集された時にデータを更新し、型変換を行う
+          const updatedData = tableInstance.current?.getData() || [];
+          const processedData = updatedData.map((row: any) => ({
+            ...row,
+            overtime_hours: typeof row.overtime_hours === 'string'
+              ? parseFloat(row.overtime_hours) || 0
+              : row.overtime_hours,
+            color: typeof row.color === 'string'
+              ? new HexColor(row.color)
+              : row.color
+          }));
+          setData(processedData);
+        }
       });
       return () => {
         if (tableInstance.current) {
@@ -100,8 +124,33 @@ export const OvertimeSetting: React.FC = () => {
   };
 
   const onClickSave = () => {
-    saveOvertimes(data);
-    toast.success("シフト情報を保存しました。");
+    // データの型変換と検証を行ってから保存
+    const validatedData = data.map(overtime => ({
+      ...overtime,
+      overtime_hours: typeof overtime.overtime_hours === 'string'
+        ? parseFloat(overtime.overtime_hours)
+        : overtime.overtime_hours
+    })).filter(overtime => {
+      // 必須フィールドの検証
+      if (!overtime.id || overtime.id.trim() === '') {
+        toast.error(`IDが空の残業データがあります`);
+        return false;
+      }
+      if (isNaN(overtime.overtime_hours) || overtime.overtime_hours < 0) {
+        toast.error(`残業時間が無効です: ${overtime.id}`);
+        return false;
+      }
+      return true;
+    });
+
+    if (validatedData.length !== data.length) {
+      toast.error("無効なデータがあるため、保存できません");
+      return;
+    }
+
+    console.log("保存前のデータ検証:", validatedData);
+    saveOvertimes(validatedData);
+    toast.success("残業情報を保存しました。");
   };
 
   return (

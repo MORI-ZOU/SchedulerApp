@@ -43,8 +43,41 @@ export const EmployeeSetting = () => {
     useEffect(() => setData(employees), [employees])
 
     const onClickAdd = () => {
-        setData([...employees, defaultEmployee]);
-        toast.success(`新しい作業者を追加しました。内容を編集して「保存」ボタンで保存してください`);
+        // IDの入力を求めるプロンプト
+        const newEmployeeId = prompt("新しい作業者のIDを入力してください（例: EMP001）:");
+        
+        if (!newEmployeeId) {
+            // キャンセルまたは空の場合は何もしない
+            return;
+        }
+        
+        // IDの重複チェック（現在の表示データと保存済みデータの両方をチェック）
+        const existingInData = data.find(emp => emp.employee_detail.id === newEmployeeId);
+        const existingInEmployees = employees.find(emp => emp.employee_detail.id === newEmployeeId);
+        
+        if (existingInData || existingInEmployees) {
+            toast.error(`ID "${newEmployeeId}" は既に使用されています。別のIDを指定してください。`);
+            return;
+        }
+        
+        // IDのバリデーション（空白、特殊文字チェック）
+        if (newEmployeeId.trim() === "" || !/^[a-zA-Z0-9_-]+$/.test(newEmployeeId)) {
+            toast.error("IDは英数字、アンダースコア、ハイフンのみ使用できます。");
+            return;
+        }
+        
+        // 新しい従業員オブジェクトを作成
+        const newEmployee: Employee = {
+            ...defaultEmployee,
+            employee_detail: {
+                ...defaultEmployee.employee_detail,
+                id: newEmployeeId,
+                name: `新しい従業員 (${newEmployeeId})`
+            }
+        };
+        
+        setData([...data, newEmployee]);
+        toast.success(`新しい作業者 "${newEmployeeId}" を追加しました。内容を編集して「保存」ボタンで保存してください`);
     }
 
     const onClickDelete = (id: string) => {
