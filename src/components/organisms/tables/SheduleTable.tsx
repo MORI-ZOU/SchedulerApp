@@ -62,7 +62,7 @@ export const ScheduleTable: React.FC<ScheduleTableProps> = ({ schedules, manhour
         const isFixedShift = fixedShifts.some(fixedShift =>
           fixedShift.date.toString() === schedule.date.toString() &&
           fixedShift.employee_id === schedule.employee.employee_detail.id &&
-          fixedShift.skill_id === schedule.skill.id &&
+          fixedShift.skill_id === schedule.primary_skill.id &&
           fixedShift.shift_id === schedule.shift.id
         );
 
@@ -75,12 +75,13 @@ export const ScheduleTable: React.FC<ScheduleTableProps> = ({ schedules, manhour
 
         row[schedule.date.toString()] = {
           shiftName: schedule.shift.name,
-          skillName: schedule.skill.name,
+          primarySkillName: schedule.primary_skill.name,
+          skillTimes: schedule.skill_times,
           overtimeHours: schedule.overtime.overtime_hours,
           isFixShift: schedule.isFixShift || isFixedShift,
           isFixOvertime: schedule.isFixOvertime || isFixedOvertime,
           shiftColor: schedule.shift.color.toString(),
-          skillColor: schedule.skill.color.toString(),
+          primarySkillColor: schedule.primary_skill.color.toString(),
           overtimeColor: schedule.overtime.color.toString()
         };
       });
@@ -150,12 +151,22 @@ export const ScheduleTable: React.FC<ScheduleTableProps> = ({ schedules, manhour
           openParen.textContent = '(';
           div.appendChild(openParen);
 
-          // Skill名のスパン（Skillの色）
-          const skillSpan = document.createElement('span');
-          skillSpan.textContent = cellValue.skillName;
-          skillSpan.style.color = cellValue.skillColor;
-          skillSpan.style.fontWeight = 'bold';
-          div.appendChild(skillSpan);
+          // Primary Skill名のスパン
+          const primarySkillSpan = document.createElement('span');
+          primarySkillSpan.textContent = cellValue.primarySkillName;
+          primarySkillSpan.style.color = cellValue.primarySkillColor;
+          primarySkillSpan.style.fontWeight = 'bold';
+          div.appendChild(primarySkillSpan);
+          
+          // Skill時間の詳細表示
+          if (cellValue.skillTimes && cellValue.skillTimes.length > 1) {
+            const skillDetailsSpan = document.createElement('span');
+            const skillDetails = cellValue.skillTimes.map((st: any) => `${st.skill_name}:${st.allocated_hours}h`).join(', ');
+            skillDetailsSpan.textContent = ` [${skillDetails}]`;
+            skillDetailsSpan.style.fontSize = '0.8em';
+            skillDetailsSpan.style.color = '#666';
+            div.appendChild(skillDetailsSpan);
+          }
 
           // 括弧閉じとスラッシュ
           const closeParen = document.createElement('span');

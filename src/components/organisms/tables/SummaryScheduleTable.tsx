@@ -51,6 +51,7 @@ export const SummaryScheduleTable: React.FC<SummaryScheduleTableProps> = ({ sche
     const totalOvertimes = employeeData.reduce((sum, employee) => sum + employee.totalOvertimes, 0);
 
     // 各日付毎の集計データを計算
+    console.log("日付ごとの工数を表示")
     const dailySummary = dates.map(date => {
       const dateSchedules = schedules.filter(s => s.date.toString() === date);
       const totalWorkhoursForDate = dateSchedules.reduce((sum, s) => sum + s.totalWorktimeHours, 0);
@@ -60,6 +61,7 @@ export const SummaryScheduleTable: React.FC<SummaryScheduleTableProps> = ({ sche
       const requiredHoursForDate = manhours
         .filter(m => m.date.toString() === date)
         .reduce((sum, m) => sum + m.required_hours, 0);
+      console.log("", date, ":(必要工数)", requiredHoursForDate, ",(残業)", totalOvertimesForDate)
 
       const differenceFromRequired = totalWorkhoursForDate - requiredHoursForDate;
 

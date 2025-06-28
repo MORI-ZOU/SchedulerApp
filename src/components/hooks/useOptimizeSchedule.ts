@@ -6,6 +6,7 @@ import { DateOnly } from '../../types/DateOnly';
 import { Time } from '../../types/Time';
 import { ShiftType } from '../../types/ShiftType';
 import { Skill } from '../../types/Skill';
+import { SkillTime } from '../../types/SkillTime';
 import { HexColor } from '../../types/HexColor';
 import { Overtime } from '../../types/Overtime';
 import { useLogin } from './useLogin';
@@ -257,11 +258,17 @@ export const useOptimizeSchedule = () => {
                         task_efficiency: skill.task_efficiency
                     }))
                 },
-                skill: {
-                    id: val.skill.id,
-                    name: val.skill.name,
-                    color: new HexColor(val.skill.color)
+                primary_skill: {
+                    id: val.primary_skill.id,
+                    name: val.primary_skill.name,
+                    color: new HexColor(val.primary_skill.color)
                 },
+                skill_times: val.skill_times.map((skillTime: any) => ({
+                    skill_id: skillTime.skill_id,
+                    skill_name: skillTime.skill_name,
+                    skill_color: skillTime.skill_color,
+                    allocated_hours: skillTime.allocated_hours
+                })),
                 shift: {
                     id: val.shift.id,
                     name: val.shift.name,

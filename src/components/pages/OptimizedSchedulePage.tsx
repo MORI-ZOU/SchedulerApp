@@ -127,7 +127,7 @@ export const OptimizedSchedulePage: React.FC = () => {
           newFixedShift.push({
             date: schedule.date,
             employee_id: schedule.employee.employee_detail.id,
-            skill_id: schedule.skill.id,
+            skill_id: schedule.primary_skill.id,
             shift_id: schedule.shift.id,
           });
         } else if (schedule.isFixShift && !update.isFixShift) {
@@ -135,7 +135,7 @@ export const OptimizedSchedulePage: React.FC = () => {
           delFixedShift.push({
             date: schedule.date,
             employee_id: schedule.employee.employee_detail.id,
-            skill_id: schedule.skill.id,
+            skill_id: schedule.primary_skill.id,
             shift_id: schedule.shift.id,
           });
         }

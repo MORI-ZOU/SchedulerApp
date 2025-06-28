@@ -6,7 +6,7 @@ const DatabaseAPI = axios.create({
     headers: {
         'Content-Type': 'application/json'
     },
-    timeout: 5000  // 5秒に設定
+    timeout: 30000  // 30秒に設定
 });
 
 export default DatabaseAPI;
