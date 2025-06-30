@@ -3,6 +3,7 @@ import { useOptimizeSchedule } from '../hooks/useOptimizeSchedule';
 import { OptimizedSchedule } from '../../types/OptimizedSchedule';
 import { ScheduleTable, SelectedCell } from '../organisms/tables/SheduleTable';
 import { SummaryScheduleTable } from '../organisms/tables/SummaryScheduleTable';
+import GanttChart from '../organisms/charts/GanttChart';
 import { toast } from 'react-toastify';
 import { useFixSchedule } from '../hooks/useFixSchedule';
 import { FixedShift } from '../../types/FixedShift';
@@ -304,6 +305,13 @@ export const OptimizedSchedulePage: React.FC = () => {
           fixedOvertimes={fixedOvertimes}
           onCellSelectionChange={handleCellSelectionChange}
         />
+
+        <div className="mt-8">
+          <GanttChart 
+            schedules={localSchedules}
+            manhours={manhours}
+          />
+        </div>
 
         <SummaryScheduleTable schedules={localSchedules} manhours={manhours} />
       </div>
