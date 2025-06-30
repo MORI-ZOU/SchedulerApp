@@ -11,6 +11,8 @@ import OptimizeModal from '../organisms/OptimizeModal';
 import { OptimizeParameter } from '../../types/OptimizeParameter';
 import { useLogin } from '../hooks/useLogin';
 import { useManhours } from '../hooks/useManhours';
+import Lottie from 'lottie-react';
+import loadingEarthAnimation from '../../assets/loading_earth.json';
 
 type Props = {
   date: string;
@@ -21,8 +23,8 @@ type Props = {
 
 export const OptimizedSchedulePage: React.FC = () => {
   const { databaseInfo } = useLogin();
-  const { getSchedules, Optimize, schedules, loading } = useOptimizeSchedule();
-  const { getFixedShifts, saveFixedShifts, deleteFixedShifts, getFixedOvertimes, saveFixedOvertimes, deleteFixedOvertimes, loading: fixScheduleLoading, fixedShifts, fixedOvertimes } = useFixSchedule();
+  const { getSchedules, Optimize, schedules, loading, optimizeProgress } = useOptimizeSchedule();
+  const { getFixedShifts, saveFixedShifts, deleteFixedShifts, getFixedOvertimes, saveFixedOvertimes, deleteFixedOvertimes, fixedShifts, fixedOvertimes } = useFixSchedule();
   const { getManhours, manhours } = useManhours();
   const [localSchedules, setLocalSchedules] = useState<OptimizedSchedule[]>([]);
   const [selectedCells, setSelectedCells] = useState<SelectedCell[]>([]);
@@ -43,6 +45,7 @@ export const OptimizedSchedulePage: React.FC = () => {
     getFixedOvertimes();
   }, [getFixedShifts, getFixedOvertimes])
 
+
   useEffect(() => {
     if (schedules) {
       setLocalSchedules(schedules);
@@ -62,9 +65,11 @@ export const OptimizedSchedulePage: React.FC = () => {
     assign_appropriate_shift_and_overtime_for_man_hours: true,
     assign_appropriate_shift_and_overtime_for_man_hours_min: true,
     assign_appropriate_shift_and_overtime_for_man_hours_max: true,
-    assign_appropriate_shift_and_overtime_for_man_hours_min_tolerance: 0,
-    assign_appropriate_shift_and_overtime_for_man_hours_max_tolerance: 0,
-    dont_assign_too_much_overtime_in_month: true
+    assign_appropriate_shift_and_overtime_for_man_hours_min_tolerance: 30,
+    assign_appropriate_shift_and_overtime_for_man_hours_max_tolerance: 30,
+    dont_assign_too_much_overtime_in_month: true,
+    equalize_employee_overtime: false,
+    solver_time_limit_seconds: 60
   }
 
   const handleCellSelectionChange = (cells: SelectedCell[]) => {
@@ -200,11 +205,61 @@ export const OptimizedSchedulePage: React.FC = () => {
     Optimize(value);
   })
 
-  if (loading) return <div>Loading...</div>;
+  if (loading && !optimizeProgress.isOptimizing) return <div>Loading...</div>;
 
   return (
     <>
-      <div className='px-20 py-2'>
+      <div className='px-20 py-2 min-h-screen overflow-auto'>
+        {/* ページトップボタン */}
+        <button
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          className="fixed bottom-8 right-8 bg-blue-500 hover:bg-blue-600 text-white p-3 rounded-full shadow-lg z-40 transition-all duration-300"
+          title="ページトップへ戻る"
+        >
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
+          </svg>
+        </button>
+
+        {/* 最適化プログレス表示 */}
+        {optimizeProgress.isOptimizing && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-8 max-w-md w-full mx-4">
+              <h3 className="text-xl font-semibold mb-4 text-center">シフト最適化中</h3>
+
+              {/* プログレスバー */}
+              <div className="w-full bg-gray-200 rounded-full h-4 mb-4">
+                <div
+                  className="bg-blue-500 h-4 rounded-full transition-all duration-1000 ease-out"
+                  style={{ width: `${optimizeProgress.progress}%` }}
+                ></div>
+              </div>
+
+              {/* プログレス情報 */}
+              <div className="text-center space-y-2">
+                <p className="text-gray-700">{optimizeProgress.message}</p>
+                <p className="text-sm text-gray-500">
+                  進捗: {Math.round(optimizeProgress.progress)}%
+                </p>
+                {optimizeProgress.timeRemaining !== undefined && optimizeProgress.timeRemaining > 0 && (
+                  <p className="text-sm text-gray-500">
+                    残り時間: 約{optimizeProgress.timeRemaining}秒
+                  </p>
+                )}
+              </div>
+
+              {/* Lottie Animation */}
+              <div className="flex justify-center mt-4">
+                <Lottie
+                  animationData={loadingEarthAnimation}
+                  loop={true}
+                  style={{ height: '240px', width: '240px' }}
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className='flex justify-end gap-1 mb-2'>
           <span className="cell-count mr-4 flex items-center">
             {selectedCells.length === 0
@@ -214,21 +269,21 @@ export const OptimizedSchedulePage: React.FC = () => {
           <button
             onClick={() => handleFixShift('shift')}
             className="text-white bg-blue-500 hover:bg-blue-600 rounded px-4 py-2"
-            disabled={selectedCells.length === 0}
+            disabled={selectedCells.length === 0 || optimizeProgress.isOptimizing}
           >
             シフト固定
           </button>
           <button
             onClick={() => handleFixShift('overtime')}
             className="text-white bg-green-500 hover:bg-green-600 rounded px-4 py-2"
-            disabled={selectedCells.length === 0}
+            disabled={selectedCells.length === 0 || optimizeProgress.isOptimizing}
           >
             残業固定
           </button>
           <button
             onClick={() => handleFixShift('none')}
             className="text-white bg-red-500 hover:bg-red-600 rounded px-4 py-2"
-            disabled={selectedCells.length === 0}
+            disabled={selectedCells.length === 0 || optimizeProgress.isOptimizing}
           >
             固定解除
           </button>
@@ -236,9 +291,10 @@ export const OptimizedSchedulePage: React.FC = () => {
         <div className="flex justify-end w-full gap-1">
           <button
             onClick={onClickOptimize}
-            className="text-white bg-blue-500 hover:bg-blue-600 rounded px-4 py-2"
+            className="text-white bg-blue-500 hover:bg-blue-600 rounded px-4 py-2 disabled:bg-gray-400"
+            disabled={optimizeProgress.isOptimizing}
           >
-            シフト生成
+            {optimizeProgress.isOptimizing ? '最適化中...' : 'シフト生成'}
           </button>
         </div>
         <ScheduleTable

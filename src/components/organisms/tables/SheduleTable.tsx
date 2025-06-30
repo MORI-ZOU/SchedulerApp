@@ -96,8 +96,7 @@ export const ScheduleTable: React.FC<ScheduleTableProps> = ({ schedules, manhour
         width: 150,
         frozen: true,
         headerSort: false,
-        headerVertical: true,
-        titleFormatter: "html",
+        titleFormatter: "html" as any,
         titleFormatterParams: { style: "text-align: center;" }
       },
       {
@@ -105,7 +104,7 @@ export const ScheduleTable: React.FC<ScheduleTableProps> = ({ schedules, manhour
         field: "totalWorkhours",
         headerSort: false,
         headerVertical: true,
-        titleFormatter: "html",
+        titleFormatter: "html" as any,
         titleFormatterParams: { style: "text-align: center;" }
       },
       {
@@ -113,7 +112,7 @@ export const ScheduleTable: React.FC<ScheduleTableProps> = ({ schedules, manhour
         field: "totalOvertimes",
         headerSort: false,
         headerVertical: true,
-        titleFormatter: "html",
+        titleFormatter: "html" as any,
         titleFormatterParams: { style: "text-align: center;" }
       },
       ...dates.map(date => ({
@@ -122,8 +121,8 @@ export const ScheduleTable: React.FC<ScheduleTableProps> = ({ schedules, manhour
         // frozen: true,
         clipboard: true,
         headerSort: false,
-        headerHozAlign: "center",
-        headerVertAlign: "middle",
+        headerHozAlign: "center" as const,
+        headerVertAlign: "middle" as const,
 
         formatter: function (cell: any) {
           const cellValue = cell.getValue();
@@ -151,22 +150,18 @@ export const ScheduleTable: React.FC<ScheduleTableProps> = ({ schedules, manhour
           openParen.textContent = '(';
           div.appendChild(openParen);
 
-          // Primary Skill名のスパン
-          const primarySkillSpan = document.createElement('span');
-          primarySkillSpan.textContent = cellValue.primarySkillName;
-          primarySkillSpan.style.color = cellValue.primarySkillColor;
-          primarySkillSpan.style.fontWeight = 'bold';
-          div.appendChild(primarySkillSpan);
-          
-          // Skill時間の詳細表示
+          // Skill時間の詳細表示またはPrimary Skill名
+          const skillSpan = document.createElement('span');
           if (cellValue.skillTimes && cellValue.skillTimes.length > 1) {
-            const skillDetailsSpan = document.createElement('span');
             const skillDetails = cellValue.skillTimes.map((st: any) => `${st.skill_name}:${st.allocated_hours}h`).join(', ');
-            skillDetailsSpan.textContent = ` [${skillDetails}]`;
-            skillDetailsSpan.style.fontSize = '0.8em';
-            skillDetailsSpan.style.color = '#666';
-            div.appendChild(skillDetailsSpan);
+            skillSpan.textContent = skillDetails;
+          } else {
+            skillSpan.textContent = cellValue.primarySkillName;
           }
+          skillSpan.style.fontSize = '1.0em';
+          skillSpan.style.color = '#666';
+          skillSpan.style.fontWeight = 'bold';
+          div.appendChild(skillSpan);
 
           // 括弧閉じとスラッシュ
           const closeParen = document.createElement('span');
@@ -197,15 +192,32 @@ export const ScheduleTable: React.FC<ScheduleTableProps> = ({ schedules, manhour
           }
 
           return div;
+        },
+        clipboardFormatter: function (cell: any) {
+          const cellValue = cell.getValue();
+          let skillText = cellValue.primarySkillName;
+          if (cellValue.skillTimes && cellValue.skillTimes.length > 1) {
+            skillText = cellValue.skillTimes.map((st: any) => `${st.skill_name}:${st.allocated_hours}h`).join(', ');
+          }
+          return `${cellValue.shiftName}(${skillText})/${cellValue.overtimeHours}`;
         }
       })),
     ]
 
     const table = new Tabulator(tableRef.current, {
-      height: "40vh",
+      height: "50vh",
       // selectable: true,
       selectableRange: true,
       selectableRangeColumns: true,
+      clipboard: true,
+      clipboardCopyConfig: {
+        columnHeaders: false,
+        columnGroups: false,
+        rowHeaders: false,
+        columnCalcs: false,
+        dataTree: false,
+        formatCells: true
+      },
       data: tableData,
       columns: columns,
     });

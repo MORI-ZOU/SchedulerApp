@@ -130,6 +130,8 @@ export const EmployeeSetting = () => {
                             <EmployeeCard
                                 key={user.employee_detail.id}
                                 employee={user}
+                                shifts={shifts}
+                                skills={skills}
                                 onClick={() => onClickUser(user.employee_detail.id)}
                                 onDelete={() => onClickDelete(user.employee_detail.id)}
                             />

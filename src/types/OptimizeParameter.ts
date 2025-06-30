@@ -13,5 +13,7 @@ export type OptimizeParameter = {
     assign_appropriate_shift_and_overtime_for_man_hours_max: boolean,
     assign_appropriate_shift_and_overtime_for_man_hours_min_tolerance: number,
     assign_appropriate_shift_and_overtime_for_man_hours_max_tolerance: number,
-    dont_assign_too_much_overtime_in_month: boolean
+    dont_assign_too_much_overtime_in_month: boolean,
+    equalize_employee_overtime: boolean,
+    solver_time_limit_seconds: number
 }

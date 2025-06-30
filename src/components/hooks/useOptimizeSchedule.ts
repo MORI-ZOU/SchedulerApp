@@ -1,16 +1,11 @@
 import { useCallback, useState } from 'react';
 import { toast } from 'react-toastify';
-import { Employee } from '../../types/Employee';
 import { OptimizedSchedule } from '../../types/OptimizedSchedule';
 import { DateOnly } from '../../types/DateOnly';
 import { Time } from '../../types/Time';
-import { ShiftType } from '../../types/ShiftType';
-import { Skill } from '../../types/Skill';
-import { SkillTime } from '../../types/SkillTime';
 import { HexColor } from '../../types/HexColor';
-import { Overtime } from '../../types/Overtime';
 import { useLogin } from './useLogin';
-import DatabaseAPI from '../api/DatabaseAPI';
+import DatabaseAPI, { setAPITimeout } from '../api/DatabaseAPI';
 import { OptimizeParameter } from '../../types/OptimizeParameter';
 
 // const emps: Array<Employee> = [
@@ -222,6 +217,17 @@ import { OptimizeParameter } from '../../types/OptimizeParameter';
 export const useOptimizeSchedule = () => {
     const [loading, setLoading] = useState<boolean>(false);
     const [schedules, setSchedules] = useState<Array<OptimizedSchedule>>([]);
+    const [optimizeProgress, setOptimizeProgress] = useState<{
+        isOptimizing: boolean;
+        progress: number;
+        message: string;
+        timeRemaining?: number;
+    }>({
+        isOptimizing: false,
+        progress: 0,
+        message: '',
+        timeRemaining: undefined
+    });
     const { databaseInfo } = useLogin();
 
     const getSchedules = useCallback(() => {
@@ -300,7 +306,39 @@ export const useOptimizeSchedule = () => {
     }, []);
 
     const Optimize = useCallback((props: OptimizeParameter) => {
-        setLoading(true);
+        // プログレス状態を先に設定
+        setOptimizeProgress({
+            isOptimizing: true,
+            progress: 0,
+            message: '最適化を開始しています...',
+            timeRemaining: props.solver_time_limit_seconds
+        });
+
+        // ソルバー実行時間制限に基づいてAPIタイムアウトを設定（余裕を持って+30秒）
+        const timeoutMs = (props.solver_time_limit_seconds + 30) * 1000;
+        setAPITimeout(timeoutMs);
+
+        // プログレス更新のインターバル
+        const startTime = Date.now();
+        const totalTime = props.solver_time_limit_seconds * 1000;
+        
+        const progressInterval = setInterval(() => {
+            const elapsed = Date.now() - startTime;
+            const progress = Math.min((elapsed / totalTime) * 100, 95); // 95%まで
+            const remaining = Math.max(0, Math.ceil((totalTime - elapsed) / 1000));
+            
+            setOptimizeProgress(prev => ({
+                ...prev,
+                progress,
+                message: progress < 20 ? '制約を設定しています...' 
+                      : progress < 60 ? 'ソルバーを実行中...' 
+                      : '結果を処理しています...',
+                timeRemaining: remaining
+            }));
+        }, 500); // 500msごとに更新してよりスムーズに
+
+        // loadingは少し遅らせて設定（プログレス表示が優先されるように）
+        setTimeout(() => setLoading(true), 100);
 
         ////データ取得
         DatabaseAPI.post("/optimize/", props).then((res) => {
@@ -311,6 +349,14 @@ export const useOptimizeSchedule = () => {
 
             console.log("res", res)
 
+            // プログレスを100%に設定
+            setOptimizeProgress(prev => ({
+                ...prev,
+                progress: 100,
+                message: 'スケジュールを取得しています...',
+                timeRemaining: 0
+            }));
+
             ////loading
             getSchedules();
 
@@ -318,8 +364,19 @@ export const useOptimizeSchedule = () => {
             toast.success("シフト最適化を実行しました")
         })
             .catch((e) => toast.error("シフト最適化に失敗しました" + e))
-            .finally(() => setLoading(false))
-    }, []);
+            .finally(() => {
+                clearInterval(progressInterval);
+                setLoading(false);
+                setOptimizeProgress({
+                    isOptimizing: false,
+                    progress: 0,
+                    message: '',
+                    timeRemaining: undefined
+                });
+                // 最適化後はデフォルトのタイムアウトに戻す
+                setAPITimeout(10000);
+            })
+    }, [getSchedules]);
 
-    return { getSchedules, Optimize, loading, schedules };
+    return { getSchedules, Optimize, loading, schedules, optimizeProgress };
 };

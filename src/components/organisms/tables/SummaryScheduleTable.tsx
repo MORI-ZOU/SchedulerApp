@@ -112,7 +112,7 @@ export const SummaryScheduleTable: React.FC<SummaryScheduleTableProps> = ({ sche
           </div>
           <div className="bg-white p-3 rounded shadow">
             <div className="text-sm text-gray-600">工数差分</div>
-            <div className={`text-xl font-bold ${summaryData.totalDifference >= 0 ? 'text-green-600' : 'text-red-600'
+            <div className={`text-xl font-bold ${summaryData.totalDifference === 0 ? 'text-black' : summaryData.totalDifference > 0 ? 'text-green-600' : 'text-red-600'
               }`}>
               {summaryData.totalDifference >= 0 ? '+' : ''}{summaryData.totalDifference.toFixed(1)}h
             </div>
@@ -141,7 +141,7 @@ export const SummaryScheduleTable: React.FC<SummaryScheduleTableProps> = ({ sche
                   <td className="px-4 py-2 text-right">{summary.totalWorkhours.toFixed(1)}h</td>
                   <td className="px-4 py-2 text-right">{summary.totalOvertimes.toFixed(1)}h</td>
                   <td className="px-4 py-2 text-right">{summary.requiredHours.toFixed(1)}h</td>
-                  <td className={`px-4 py-2 text-right font-semibold ${summary.difference >= 0 ? 'text-green-600' : 'text-red-600'
+                  <td className={`px-4 py-2 text-right font-semibold ${summary.difference === 0 ? 'text-black' : summary.difference > 0 ? 'text-green-600' : 'text-red-600'
                     }`}>
                     {summary.difference >= 0 ? '+' : ''}{summary.difference.toFixed(1)}h
                   </td>

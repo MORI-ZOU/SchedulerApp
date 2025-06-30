@@ -141,6 +141,18 @@ const OptimizeModal: React.FC<OptimizeModalProps> = ({
                                 type: 'number',
                                 value: optimizeParam.assign_appropriate_shift_and_overtime_for_man_hours_max_tolerance,
                             },
+                            {
+                                label: '従業員間の残業時間を均等化する',
+                                name: 'equalize_employee_overtime',
+                                type: 'checkbox',
+                                value: optimizeParam.equalize_employee_overtime,
+                            },
+                            {
+                                label: 'ソルバー実行時間制限(秒)',
+                                name: 'solver_time_limit_seconds',
+                                type: 'number',
+                                value: optimizeParam.solver_time_limit_seconds,
+                            },
                         ].map((item, index) => (
                             <div key={index} className="flex items-center">
                                 {item.type === 'checkbox' ? (

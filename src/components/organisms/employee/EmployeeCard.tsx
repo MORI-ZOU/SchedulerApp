@@ -1,15 +1,19 @@
 import React, { FC } from 'react';
 import { Employee } from '../../../types/Employee';
+import { Shift } from '../../../types/Shift';
+import { Skill } from '../../../types/Skill';
 import { Icon } from "@iconify/react";
 
 type Props = {
     employee: Employee;
+    shifts?: Shift[];
+    skills?: Skill[];
     onClick: (id: string) => void;
     onDelete: (id: string) => void;  // 新しいプロパティを追加
 };
 
 export const EmployeeCard: FC<Props> = (props) => {
-    const { employee, onClick, onDelete } = props;
+    const { employee, shifts, skills, onClick, onDelete } = props;
 
     return (
         <div className="w-90 h-full p-6 rounded-lg border-2 border-gray-300 flex flex-col relative shadow-lg shadow-gray-300 hover:bg-slate-50">
@@ -43,19 +47,25 @@ export const EmployeeCard: FC<Props> = (props) => {
             <div className="text-gray-600 mb-2">
                 <h3 className="font-medium">有効なシフト:</h3>
                 <ul>
-                    {employee.valid_shifts.map((shift, index) => (
-                        <li key={index}>シフトID: {shift.shift_id}</li>
-                    ))}
+                    {employee.valid_shifts.map((shift, index) => {
+                        const shiftName = shifts?.find(s => s.id === shift.shift_id)?.name || shift.shift_id;
+                        return (
+                            <li key={index}>{shiftName}</li>
+                        );
+                    })}
                 </ul>
             </div>
             <div className="text-gray-600 mb-2">
                 <h3 className="font-medium">有効なスキル:</h3>
                 <ul>
-                    {employee.valid_skills.map((skill, index) => (
-                        <li key={index}>
-                            スキルID: {skill.skill_id}, 効率: {skill.task_efficiency}
-                        </li>
-                    ))}
+                    {employee.valid_skills.map((skill, index) => {
+                        const skillName = skills?.find(s => s.id === skill.skill_id)?.name || skill.skill_id;
+                        return (
+                            <li key={index}>
+                                {skillName}, 効率: {skill.task_efficiency}
+                            </li>
+                        );
+                    })}
                 </ul>
             </div>
             <button
